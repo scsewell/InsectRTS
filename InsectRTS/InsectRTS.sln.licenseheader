@@ -1,0 +1,6 @@
+extensions: designer.cs generated.cs
+extensions: .cs .cpp .h
+/*
+* Copyright © 2018-2019 Scott Sewell
+* See "Licence.txt" for full licence.
+*/
