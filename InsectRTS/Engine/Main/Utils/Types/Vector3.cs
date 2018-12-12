@@ -997,26 +997,9 @@ namespace Engine
         /// <param name="binormal">The binormal of the basis as an output parameter.</param>
         public static void OrthoNormalize(ref Vector3 normal, ref Vector3 tangent, out Vector3 binormal)
         {
-            if (normal.LengthSquared > float.Epsilon)
-            {
-                Normalize(ref normal, out normal);
-            }
-            else
-            {
-                normal = UnitX;
-            }
-
+            Normalize(ref normal, out normal);
             Cross(ref normal, ref tangent, out binormal);
-
-            if (binormal.LengthSquared > float.Epsilon)
-            {
-                Normalize(ref binormal, out binormal);
-            }
-            else
-            {
-                binormal = UnitZ;
-            }
-
+            Normalize(ref binormal, out binormal);
             Cross(ref binormal, ref normal, out tangent);
         }
 
@@ -1133,31 +1116,92 @@ namespace Engine
         }
 
         /// <summary>
+        /// Applies a transformation to all vectors within array and places the resuls in an another array.
+        /// </summary>
+        /// <param name="srcArray">The vectors to transform.</param>
+        /// <param name="matrix">The transformation to apply.</param>
+        /// <param name="destArray">The array transformed vectors are output to.</param>
+        public static void TransformPosition(Vector3[] srcArray, ref Matrix matrix, Vector3[] destArray)
+        {
+            if (srcArray == null)
+            {
+                throw new ArgumentNullException("srcArray");
+            }
+            if (destArray == null)
+            {
+                throw new ArgumentNullException("destArray");
+            }
+            if (destArray.Length < srcArray.Length)
+            {
+                throw new ArgumentException("Destination array is smaller than source array.");
+            }
+
+            for (int i = 0; i < srcArray.Length; i++)
+            {
+                TransformPosition(ref srcArray[i], ref matrix, out destArray[i]);
+            }
+        }
+
+        /// <summary>
+        /// Applies a transformation to all vectors within array and places the results in an another array.
+        /// </summary>
+        /// <param name="srcArray">The vectors to transform.</param>
+        /// <param name="srcIndex">The starting index in the source array.</param>
+        /// <param name="matrix">The transformation to apply.</param>
+        /// <param name="destArray">The array transformed vectors are output to.</param>
+        /// <param name="destIndex">The starting index in the destination array.</param>
+        /// <param name="length">The number of vectors to be transformed.</param>
+        public static void TransformPosition(Vector3[] srcArray, int srcIndex, ref Matrix matrix, Vector3[] destArray, int destIndex, int length)
+        {
+            if (srcArray == null)
+            {
+                throw new ArgumentNullException("srcArray");
+            }
+            if (destArray == null)
+            {
+                throw new ArgumentNullException("destArray");
+            }
+            if (srcArray.Length < srcIndex + length)
+            {
+                throw new ArgumentException("Source array length is lesser than sourceIndex + length");
+            }
+            if (destArray.Length < destIndex + length)
+            {
+                throw new ArgumentException("Destination array length is lesser than destinationIndex + length");
+            }
+
+            for (int i = 0; i < length; i++)
+            {
+                TransformPosition(ref srcArray[srcIndex + i], ref matrix, out destArray[destIndex + i]);
+            }
+        }
+
+        /// <summary>
         /// Transforms a direction vector.
         /// </summary>
-        /// <param name="position">The vector to transform.</param>
+        /// <param name="direction">The vector to transform.</param>
         /// <param name="matrix">The transformation to apply.</param>
-        public static Vector3 TransformDirection(Vector3 position, Matrix matrix)
+        public static Vector3 TransformDirection(Vector3 direction, Matrix matrix)
         {
-            TransformDirection(ref position, ref matrix, out Vector3 result);
+            TransformDirection(ref direction, ref matrix, out Vector3 result);
             return result;
         }
 
         /// <summary>
         /// Transforms a direction vector.
         /// </summary>
-        /// <param name="position">The vector to transform.</param>
+        /// <param name="direction">The vector to transform.</param>
         /// <param name="matrix">The transformation to apply.</param>
         /// <param name="result">The transformed vector as an output parameter.</param>
-        public static void TransformDirection(ref Vector3 position, ref Matrix matrix, out Vector3 result)
+        public static void TransformDirection(ref Vector3 direction, ref Matrix matrix, out Vector3 result)
         {
-            result.x = (position.x * matrix.m00) + (position.y * matrix.m10) + (position.z * matrix.m20);
-            result.y = (position.x * matrix.m01) + (position.y * matrix.m11) + (position.z * matrix.m21);
-            result.z = (position.x * matrix.m02) + (position.y * matrix.m12) + (position.z * matrix.m22);
+            result.x = (direction.x * matrix.m00) + (direction.y * matrix.m10) + (direction.z * matrix.m20);
+            result.y = (direction.x * matrix.m01) + (direction.y * matrix.m11) + (direction.z * matrix.m21);
+            result.z = (direction.x * matrix.m02) + (direction.y * matrix.m12) + (direction.z * matrix.m22);
         }
 
         /// <summary>
-        /// Applies a transformation to all vectors within array and places the resuls in an another array.
+        /// Applies a transformation to all vectors within array and places the results in an another array.
         /// </summary>
         /// <param name="srcArray">The vectors to transform.</param>
         /// <param name="matrix">The transformation to apply.</param>
@@ -1184,7 +1228,7 @@ namespace Engine
         }
 
         /// <summary>
-        /// Applies a transformation to all vectors within array and places the resuls in an another array.
+        /// Applies a transformation to all vectors within array and places the results in an another array.
         /// </summary>
         /// <param name="srcArray">The vectors to transform.</param>
         /// <param name="srcIndex">The starting index in the source array.</param>
@@ -1249,7 +1293,7 @@ namespace Engine
         }
 
         /// <summary>
-        /// Applies a transformation to all normal vectors within array and places the resuls in an another array.
+        /// Applies a transformation to all normal vectors within array and places the results in an another array.
         /// </summary>
         /// <remarks>
         /// This calculates the inverse of the given matrix, use <see cref="TransformNormalInverse(Vector3[], ref Matrix, Vector3[])"/>
@@ -1265,7 +1309,7 @@ namespace Engine
         }
 
         /// <summary>
-        /// Applies a transformation to all normal vectors within array and places the resuls in an another array.
+        /// Applies a transformation to all normal vectors within array and places the results in an another array.
         /// </summary>
         /// <remarks>
         /// This calculates the inverse of the given matrix, use <see cref="TransformNormalInverse(Vector3[], int, ref Matrix, Vector3[], int, int)"/>
@@ -1293,9 +1337,9 @@ namespace Engine
         /// <param name="normal">The normal to transform.</param>
         /// <param name="invMat">The inverse of the desired transformation.</param>
         /// <param name="result">The transformed normal as an output parameter.</param>
-        public static Vector3 TransformNormalInverse(Vector3 norm, Matrix invMat)
+        public static Vector3 TransformNormalInverse(Vector3 normal, Matrix invMat)
         {
-            TransformNormalInverse(ref norm, ref invMat, out Vector3 result);
+            TransformNormalInverse(ref normal, ref invMat, out Vector3 result);
             return result;
         }
 
@@ -1317,7 +1361,7 @@ namespace Engine
         }
 
         /// <summary>
-        /// Applies a transformation to all normal vectors within array and places the resuls in an another array.
+        /// Applies a transformation to all normal vectors within array and places the results in an another array.
         /// </summary>
         /// <remarks>
         /// This version doesn't calculate the inverse matrix.
@@ -1348,7 +1392,7 @@ namespace Engine
         }
 
         /// <summary>
-        /// Applies a transformation to all normal vectors within array and places the resuls in an another array.
+        /// Applies a transformation to all normal vectors within array and places the results in an another array.
         /// </summary>
         /// <remarks>
         /// This version doesn't calculate the inverse matrix.
@@ -1386,6 +1430,95 @@ namespace Engine
         }
 
         /// <summary>
+        /// Transform a vector accounting for perspective.
+        /// </summary>
+        /// <param name="vector">The vector to transform.</param>
+        /// <param name="matrix">The transformation to apply.</param>
+        public static Vector3 TransformPerspective(Vector3 vector, Matrix matrix)
+        {
+            TransformPerspective(ref vector, ref matrix, out vector);
+            return vector;
+        }
+
+        /// <summary>
+        /// Transform a vector accounting for perspective.
+        /// </summary>
+        /// <param name="vector">The vector to transform.</param>
+        /// <param name="matrix">The transformation to apply.</param>
+        /// <param name="result">The transformed vector as an output parameter.</param>
+        public static void TransformPerspective(ref Vector3 vector, ref Matrix mat, out Vector3 result)
+        {
+            Vector4 v = new Vector4(vector.x, vector.y, vector.z, 1f);
+            Vector4.Transform(ref v, ref mat, out Vector4 p);
+
+            float scale = 1f / p.w;
+            result.x = p.x * scale;
+            result.y = p.y * scale;
+            result.z = p.z * scale;
+        }
+
+        /// <summary>
+        /// Applies a transformation to all vectors within array and places the results in an another array.
+        /// </summary>
+        /// <param name="srcArray">The vectors to transform.</param>
+        /// <param name="matrix">The transformation to apply.</param>
+        /// <param name="destArray">The array transformed vectors are output to.</param>
+        public static void TransformPerspective(Vector3[] srcArray, ref Matrix matrix, Vector3[] destArray)
+        {
+            if (srcArray == null)
+            {
+                throw new ArgumentNullException("srcArray");
+            }
+            if (destArray == null)
+            {
+                throw new ArgumentNullException("destArray");
+            }
+            if (destArray.Length < srcArray.Length)
+            {
+                throw new ArgumentException("Destination array is smaller than source array.");
+            }
+
+            for (int i = 0; i < srcArray.Length; i++)
+            {
+                TransformPerspective(ref srcArray[i], ref matrix, out destArray[i]);
+            }
+        }
+
+        /// <summary>
+        /// Applies a transformation to all vectors within array and places the results in an another array.
+        /// </summary>
+        /// <param name="srcArray">The vectors to transform.</param>
+        /// <param name="srcIndex">The starting index in the source array.</param>
+        /// <param name="matrix">The transformation to apply.</param>
+        /// <param name="destArray">The array transformed vectors are output to.</param>
+        /// <param name="destIndex">The starting index in the destination array.</param>
+        /// <param name="length">The number of vectors to be transformed.</param>
+        public static void TransformPerspective(Vector3[] srcArray, int srcIndex, ref Matrix matrix, Vector3[] destArray, int destIndex, int length)
+        {
+            if (srcArray == null)
+            {
+                throw new ArgumentNullException("srcArray");
+            }
+            if (destArray == null)
+            {
+                throw new ArgumentNullException("destArray");
+            }
+            if (srcArray.Length < srcIndex + length)
+            {
+                throw new ArgumentException("Source array length is lesser than sourceIndex + length");
+            }
+            if (destArray.Length < destIndex + length)
+            {
+                throw new ArgumentException("Destination array length is lesser than destinationIndex + length");
+            }
+
+            for (int i = 0; i < length; i++)
+            {
+                TransformPerspective(ref srcArray[srcIndex + i], ref matrix, out destArray[destIndex + i]);
+            }
+        }
+
+        /// <summary>
         /// Projects a vector from world space into screen space.
         /// </summary>
         /// <param name="vector">The vector to project.</param>
@@ -1403,14 +1536,8 @@ namespace Engine
         /// </remarks>
         public static Vector3 Project(Vector3 vector, float x, float y, float width, float height, float minZ, float maxZ, Matrix viewProj)
         {
-            Vector4 result;
-            result.x = (vector.x * viewProj.m00) + (vector.y * viewProj.m10) + (vector.z * viewProj.m20) + viewProj.m30;
-            result.y = (vector.x * viewProj.m01) + (vector.y * viewProj.m11) + (vector.z * viewProj.m21) + viewProj.m31;
-            result.z = (vector.x * viewProj.m02) + (vector.y * viewProj.m12) + (vector.z * viewProj.m22) + viewProj.m32;
-            result.w = (vector.x * viewProj.m03) + (vector.y * viewProj.m13) + (vector.z * viewProj.m23) + viewProj.m33;
-
-            result /= result.w;
-
+            TransformPerspective(ref vector, ref viewProj, out Vector3 result);
+            
             result.x = x + (width * ((result.x + 1f) / 2f));
             result.y = y + (height * ((result.y + 1f) / 2f));
             result.z = minZ + ((maxZ - minZ) * ((result.z + 1f) / 2f));
@@ -1436,17 +1563,11 @@ namespace Engine
         /// </remarks>
         public static Vector3 Unproject(Vector3 vector, float x, float y, float width, float height, float minZ, float maxZ, Matrix invViewProj)
         {
-            Vector4 result;
-            result.x = ((vector.x - x) / width * 2f) - 1f;
-            result.y = ((vector.y - y) / height * 2f) - 1f;
-            result.z = (vector.z / (maxZ - minZ) * 2f) - 1f;
+            vector.x = ((vector.x - x) / width * 2f) - 1f;
+            vector.y = ((vector.y - y) / height * 2f) - 1f;
+            vector.z = (vector.z / (maxZ - minZ) * 2f) - 1f;
 
-            result.x = (result.x * invViewProj.m00) + (result.y * invViewProj.m10) + (result.z * invViewProj.m20) + invViewProj.m30;
-            result.y = (result.x * invViewProj.m01) + (result.y * invViewProj.m11) + (result.z * invViewProj.m21) + invViewProj.m31;
-            result.z = (result.x * invViewProj.m02) + (result.y * invViewProj.m12) + (result.z * invViewProj.m22) + invViewProj.m32;
-            result.w = (result.x * invViewProj.m03) + (result.y * invViewProj.m13) + (result.z * invViewProj.m23) + invViewProj.m33;
-
-            result /= result.w;
+            TransformPerspective(ref vector, ref invViewProj, out Vector3 result);
             return result;
         }
 
@@ -1492,7 +1613,7 @@ namespace Engine
         /// </summary>
         public override string ToString()
         {
-            const string format = "N2";
+            const string format = "F2";
             return $"({x.ToString(format)}, {y.ToString(format)}, {z.ToString(format)})";
         }
 

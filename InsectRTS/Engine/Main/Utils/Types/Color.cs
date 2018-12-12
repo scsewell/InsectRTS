@@ -452,7 +452,7 @@ namespace Engine
         /// </summary>
         public override string ToString()
         {
-            const string format = "N2";
+            const string format = "F2";
             return $"({r.ToString(format)}, {g.ToString(format)}, {b.ToString(format)}, {a.ToString(format)})";
         }
 

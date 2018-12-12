@@ -368,7 +368,7 @@ namespace Engine
         }
 
         /// <summary>
-        /// The left vector formed from the first row -M11, -M12, -M13 elements.
+        /// The left vector formed from the first row -m00, -m01, -m02 elements.
         /// </summary>
         public Vector3 Left
         {
@@ -382,7 +382,7 @@ namespace Engine
         }
 
         /// <summary>
-        /// The right vector formed from the first row M11, M12, M13 elements.
+        /// The right vector formed from the first row m00, m01, m02 elements.
         /// </summary>
         public Vector3 Right
         {
@@ -396,7 +396,7 @@ namespace Engine
         }
 
         /// <summary>
-        /// The down vector formed from the second row -M21, -M22, -M23 elements.
+        /// The down vector formed from the second row -m10, -m11, -m12 elements.
         /// </summary>
         public Vector3 Down
         {
@@ -410,7 +410,7 @@ namespace Engine
         }
 
         /// <summary>
-        /// The upper vector formed from the second row M21, M22, M23 elements.
+        /// The upper vector formed from the second row m10, m11, m12 elements.
         /// </summary>
         public Vector3 Up
         {
@@ -424,7 +424,7 @@ namespace Engine
         }
 
         /// <summary>
-        /// The forward vector formed from the third row -M31, -M32, -M33 elements.
+        /// The forward vector formed from the third row -m20, -m21, -m22 elements.
         /// </summary>
         public Vector3 Forward
         {
@@ -438,7 +438,7 @@ namespace Engine
         }
 
         /// <summary>
-        /// The backward vector formed from the third row M31, M32, M33 elements.
+        /// The backward vector formed from the third row m20, m21, m22 elements.
         /// </summary>
         public Vector3 Backward
         {
@@ -471,7 +471,7 @@ namespace Engine
         public float Trace => m00 + m11 + m22 + m33;
 
         /// <summary>
-        /// The determinant of this <see cref="Matrix"/>.
+        /// The determinant of this matrix.
         /// </summary>
         public float Determinant
         {
@@ -492,12 +492,12 @@ namespace Engine
                 float num4 = m30;
                 float num3 = m31;
                 float num2 = m32;
-                float num = m33;
+                float num1 = m33;
 
-                float num18 = (num6 * num) - (num5 * num2);
-                float num17 = (num7 * num) - (num5 * num3);
+                float num18 = (num6 * num1) - (num5 * num2);
+                float num17 = (num7 * num1) - (num5 * num3);
                 float num16 = (num7 * num2) - (num6 * num3);
-                float num15 = (num8 * num) - (num5 * num4);
+                float num15 = (num8 * num1) - (num5 * num4);
                 float num14 = (num8 * num2) - (num6 * num4);
                 float num13 = (num8 * num3) - (num7 * num4);
 
@@ -505,7 +505,8 @@ namespace Engine
                     (num22 * ((num11 * num18) - (num10 * num17) + (num9 * num16))) -
                     (num21 * ((num12 * num18) - (num10 * num15) + (num9 * num14))) +
                     (num20 * ((num12 * num17) - (num11 * num15) + (num9 * num13))) -
-                    (num19 * ((num12 * num16) - (num11 * num14) + (num10 * num13)));
+                    (num19 * ((num12 * num16) - (num11 * num14) + (num10 * num13))
+                );
             }
         }
 
@@ -549,10 +550,15 @@ namespace Engine
         /// <param name="index">The zero indexed row number.</param>
         public void SetRow(int index, Vector4 row)
         {
-            this[index, 0] = row.x;
-            this[index, 1] = row.y;
-            this[index, 2] = row.z;
-            this[index, 3] = row.w;
+            switch (index)
+            {
+                case 0: Row0 = row; break;
+                case 1: Row1 = row; break;
+                case 2: Row2 = row; break;
+                case 3: Row3 = row; break;
+                default:
+                    throw new IndexOutOfRangeException();
+            }
         }
 
         /// <summary>
@@ -568,19 +574,18 @@ namespace Engine
         }
 
         /// <summary>
-        /// Creates a new <see cref="Matrix"/> which contains sum of two matrixes.
+        /// Creates a new matrix which contains sum of two matrixes.
         /// </summary>
         /// <param name="left">The left operand of the addition.</param>
         /// <param name="right">The right operand of the addition.</param>
-        /// <returns>The result of the matrix addition.</returns>
         public static Matrix Add(Matrix left, Matrix right)
         {
-            Add(ref left, ref right, out Matrix result);
-            return result;
+            Add(ref left, ref right, out left);
+            return left;
         }
 
         /// <summary>
-        /// Creates a new <see cref="Matrix"/> which contains sum of two matrixes.
+        /// Creates a new matrix which contains sum of two matrixes.
         /// </summary>
         /// <param name="left">The left operand of the addition.</param>
         /// <param name="right">The right operand of the addition.</param>
@@ -606,19 +611,19 @@ namespace Engine
         }
 
         /// <summary>
-        /// Creates a new <see cref="Matrix"/> which contains difference of two matrixes.
+        /// Creates a new matrix which contains difference of two matrixes.
         /// </summary>
         /// <param name="left">The left operand of the subtraction.</param>
         /// <param name="right">The right operand of the subtraction.</param>
         /// <returns>The result of the matrix subtraction.</returns>
         public static Matrix Subtract(Matrix left, Matrix right)
         {
-            Subtract(ref left, ref right, out Matrix result);
-            return result;
+            Subtract(ref left, ref right, out left);
+            return left;
         }
 
         /// <summary>
-        /// Creates a new <see cref="Matrix"/> which contains difference of two matrixes.
+        /// Creates a new matrix which contains difference of two matrixes.
         /// </summary>
         /// <param name="left">The left operand of the subtraction.</param>
         /// <param name="right">The right operand of the subtraction.</param>
@@ -650,8 +655,8 @@ namespace Engine
         /// <returns>Result of the matrix negation.</returns>
         public static Matrix Negate(Matrix matrix)
         {
-            Negate(ref matrix, out Matrix result);
-            return result;
+            Negate(ref matrix, out matrix);
+            return matrix;
         }
 
         /// <summary>
@@ -680,7 +685,7 @@ namespace Engine
         }
 
         /// <summary>
-        /// Creates a new <see cref="Matrix"/> that contains a multiplication of two matrix.
+        /// Creates a new matrix that contains a multiplication of two matrix.
         /// </summary>
         /// <param name="left">Source <see cref="Matrix"/>.</param>
         /// <param name="right">Source <see cref="Matrix"/>.</param>
@@ -692,7 +697,7 @@ namespace Engine
         }
 
         /// <summary>
-        /// Creates a new <see cref="Matrix"/> that contains a multiplication of two matrices.
+        /// Creates a new matrix that contains a multiplication of two matrices.
         /// </summary>
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
@@ -718,60 +723,60 @@ namespace Engine
         }
 
         /// <summary>
-        /// Creates a new <see cref="Matrix"/> that contains a multiplication of <see cref="Matrix"/> and a scalar.
+        /// Creates a new matrix that contains a multiplication of a matrix and a scalar.
         /// </summary>
         /// <param name="matrix">The matrix to scale.</param>
-        /// <param name="scaleFactor">Scalar value.</param>
+        /// <param name="scale">Scalar value.</param>
         /// <returns>Result of the matrix multiplication with a scalar.</returns>
-        public static Matrix Multiply(Matrix matrix, float scaleFactor)
+        public static Matrix Multiply(Matrix matrix, float scale)
         {
-            Negate(ref matrix, out Matrix result);
-            return result;
+            Multiply(ref matrix, scale, out matrix);
+            return matrix;
         }
 
         /// <summary>
-        /// Creates a new <see cref="Matrix"/> that contains a multiplication of <see cref="Matrix"/> and a scalar.
+        /// Creates a new matrix that contains a multiplication of a matrix and a scalar.
         /// </summary>
         /// <param name="matrix">The matrix to scale.</param>
-        /// <param name="scaleFactor">Scalar value.</param>
+        /// <param name="scale">Scalar value.</param>
         /// <param name="result">Result of the matrix multiplication with a scalar as an output parameter.</param>
-        public static void Multiply(ref Matrix matrix, float scaleFactor, out Matrix result)
+        public static void Multiply(ref Matrix matrix, float scale, out Matrix result)
         {
-            result.m00 = matrix.m00 * scaleFactor;
-            result.m01 = matrix.m01 * scaleFactor;
-            result.m02 = matrix.m02 * scaleFactor;
-            result.m03 = matrix.m03 * scaleFactor;
-            result.m10 = matrix.m10 * scaleFactor;
-            result.m11 = matrix.m11 * scaleFactor;
-            result.m12 = matrix.m12 * scaleFactor;
-            result.m13 = matrix.m13 * scaleFactor;
-            result.m20 = matrix.m20 * scaleFactor;
-            result.m21 = matrix.m21 * scaleFactor;
-            result.m22 = matrix.m22 * scaleFactor;
-            result.m23 = matrix.m23 * scaleFactor;
-            result.m30 = matrix.m30 * scaleFactor;
-            result.m31 = matrix.m31 * scaleFactor;
-            result.m32 = matrix.m32 * scaleFactor;
-            result.m33 = matrix.m33 * scaleFactor;
+            result.m00 = matrix.m00 * scale;
+            result.m01 = matrix.m01 * scale;
+            result.m02 = matrix.m02 * scale;
+            result.m03 = matrix.m03 * scale;
+            result.m10 = matrix.m10 * scale;
+            result.m11 = matrix.m11 * scale;
+            result.m12 = matrix.m12 * scale;
+            result.m13 = matrix.m13 * scale;
+            result.m20 = matrix.m20 * scale;
+            result.m21 = matrix.m21 * scale;
+            result.m22 = matrix.m22 * scale;
+            result.m23 = matrix.m23 * scale;
+            result.m30 = matrix.m30 * scale;
+            result.m31 = matrix.m31 * scale;
+            result.m32 = matrix.m32 * scale;
+            result.m33 = matrix.m33 * scale;
         }
 
         /// <summary>
-        /// Divides the elements of a <see cref="Matrix"/> by the elements of another matrix.
+        /// Divides the elements of a matrix by the elements of another matrix.
         /// </summary>
-        /// <param name="left">Source <see cref="Matrix"/>.</param>
-        /// <param name="right">Divisor <see cref="Matrix"/>.</param>
+        /// <param name="left">The matrix of numerators.</param>
+        /// <param name="right">The matrix of denominators.</param>
         /// <returns>The result of dividing the matrix.</returns>
         public static Matrix Divide(Matrix left, Matrix right)
         {
-            Divide(ref left, ref right, out Matrix result);
-            return result;
+            Divide(ref left, ref right, out left);
+            return left;
         }
 
         /// <summary>
-        /// Divides the elements of a <see cref="Matrix"/> by the elements of another matrix.
+        /// Divides the elements of a matrix by the elements of another matrix.
         /// </summary>
-        /// <param name="left">Source <see cref="Matrix"/>.</param>
-        /// <param name="right">Divisor <see cref="Matrix"/>.</param>
+        /// <param name="left">The matrix of numerators.</param>
+        /// <param name="right">The matrix of denominators.</param>
         /// <param name="result">The result of dividing the matrix as an output parameter.</param>
         public static void Divide(ref Matrix left, ref Matrix right, out Matrix result)
         {
@@ -793,52 +798,50 @@ namespace Engine
             result.m33 = left.m33 / right.m33;
         }
 
-        /// <summary>
-        /// Divides the elements of a <see cref="Matrix"/> by a scalar.
+        /// Divides the elements of a matrix by a scalar.
         /// </summary>
-        /// <param name="matrix">Source <see cref="Matrix"/>.</param>
+        /// <param name="matrix">The matrix to divide.</param>
         /// <param name="divider">Divisor scalar.</param>
         /// <returns>The result of dividing a matrix by a scalar.</returns>
         public static Matrix Divide(Matrix matrix, float divider)
         {
-            Divide(ref matrix, divider, out Matrix result);
-            return result;
+            Divide(ref matrix, divider, out matrix);
+            return matrix;
         }
 
         /// <summary>
-        /// Divides the elements of a <see cref="Matrix"/> by a scalar.
+        /// Divides the elements of a matrix by a scalar.
         /// </summary>
-        /// <param name="matrix">Source <see cref="Matrix"/>.</param>
+        /// <param name="matrix">The matrix to divide.</param>
         /// <param name="divider">Divisor scalar.</param>
         /// <param name="result">The result of dividing a matrix by a scalar as an output parameter.</param>
         public static void Divide(ref Matrix matrix, float divider, out Matrix result)
         {
-            float num = 1f / divider;
-            result.m00 = matrix.m00 * num;
-            result.m01 = matrix.m01 * num;
-            result.m02 = matrix.m02 * num;
-            result.m03 = matrix.m03 * num;
-            result.m10 = matrix.m10 * num;
-            result.m11 = matrix.m11 * num;
-            result.m12 = matrix.m12 * num;
-            result.m13 = matrix.m13 * num;
-            result.m20 = matrix.m20 * num;
-            result.m21 = matrix.m21 * num;
-            result.m22 = matrix.m22 * num;
-            result.m23 = matrix.m23 * num;
-            result.m30 = matrix.m30 * num;
-            result.m31 = matrix.m31 * num;
-            result.m32 = matrix.m32 * num;
-            result.m33 = matrix.m33 * num;
+            float scale = 1f / divider;
+            result.m00 = matrix.m00 * scale;
+            result.m01 = matrix.m01 * scale;
+            result.m02 = matrix.m02 * scale;
+            result.m03 = matrix.m03 * scale;
+            result.m10 = matrix.m10 * scale;
+            result.m11 = matrix.m11 * scale;
+            result.m12 = matrix.m12 * scale;
+            result.m13 = matrix.m13 * scale;
+            result.m20 = matrix.m20 * scale;
+            result.m21 = matrix.m21 * scale;
+            result.m22 = matrix.m22 * scale;
+            result.m23 = matrix.m23 * scale;
+            result.m30 = matrix.m30 * scale;
+            result.m31 = matrix.m31 * scale;
+            result.m32 = matrix.m32 * scale;
+            result.m33 = matrix.m33 * scale;
         }
 
         /// <summary>
-        /// Creates a new <see cref="Matrix"/> that contains linear interpolation of the values in specified matrixes.
+        /// Creates a new matrix that contains linear interpolation of the values in specified matrixes.
         /// </summary>
         /// <param name="a">The matrix to interpolate from.</param>
         /// <param name="b">The matrix to interpolate to.</param>
         /// <param name="t">Weighting value between 0 and 1.</param>
-        /// <returns>>The result of linear interpolation of the specified matrixes.</returns>
         public static Matrix Lerp(Matrix a, Matrix b, float t)
         {
             Lerp(ref a, ref b, t, out a);
@@ -846,7 +849,7 @@ namespace Engine
         }
 
         /// <summary>
-        /// Creates a new <see cref="Matrix"/> that contains linear interpolation of the values in specified matrixes.
+        /// Creates a new matrix that contains linear interpolation of the values in specified matrixes.
         /// </summary>
         /// <param name="a">The matrix to interpolate from.</param>
         /// <param name="b">The matrix to interpolate to.</param>
@@ -876,7 +879,6 @@ namespace Engine
         /// Swaps the rows and columns of a matrix.
         /// </summary>
         /// <param name="matrix">The matrix to tranpose.</param>
-        /// <returns>A new <see cref="Matrix"/> containing the transposed result.</returns>
         public static Matrix Transpose(Matrix matrix)
         {
             Transpose(ref matrix, out Matrix result);
@@ -887,7 +889,7 @@ namespace Engine
         /// Swaps the rows and columns of a matrix.
         /// </summary>
         /// <param name="matrix">The matrix to tranpose.</param>
-        /// <returns>A new <see cref="Matrix"/> containing the transposed result.</returns>
+        /// <returns>The result as an output parameter.</returns>
         public static void Transpose(ref Matrix matrix, out Matrix result)
         {
             result.m00 = matrix.m00;
@@ -912,10 +914,9 @@ namespace Engine
         }
 
         /// <summary>
-        /// Creates a new <see cref="Matrix"/> which contains inversion of the specified matrix. 
+        /// Creates a new matrix which contains inversion of the specified matrix. 
         /// </summary>
-        /// <param name="matrix">Source <see cref="Matrix"/>.</param>
-        /// <returns>The inverted matrix.</returns>
+        /// <param name="matrix">The matrix to inver.</param>
         public static Matrix Invert(Matrix matrix)
         {
             Invert(ref matrix, out Matrix result);
@@ -923,137 +924,75 @@ namespace Engine
         }
 
         /// <summary>
-        /// Creates a new <see cref="Matrix"/> which contains inversion of the specified matrix.
+        /// Creates a new matrix which contains inversion of the specified matrix. 
         /// </summary>
-        /// <param name="matrix">Source <see cref="Matrix"/>.</param>
+        /// <param name="matrix">The matrix to inver.</param>
         /// <param name="result">The inverted matrix as output parameter.</param>
         public static void Invert(ref Matrix matrix, out Matrix result)
         {
-            int[] colIdx = { 0, 0, 0, 0 };
-            int[] rowIdx = { 0, 0, 0, 0 };
-            int[] pivotIdx = { -1, -1, -1, -1 };
+            float num1 = matrix.m00;
+            float num2 = matrix.m01;
+            float num3 = matrix.m02;
+            float num4 = matrix.m03;
+            float num5 = matrix.m10;
+            float num6 = matrix.m11;
+            float num7 = matrix.m12;
+            float num8 = matrix.m13;
+            float num9 = matrix.m20;
+            float num10 = matrix.m21;
+            float num11 = matrix.m22;
+            float num12 = matrix.m23;
+            float num13 = matrix.m30;
+            float num14 = matrix.m31;
+            float num15 = matrix.m32;
+            float num16 = matrix.m33;
 
-            // convert the matrix to an array for easy looping
-            float[,] inverse =
-            {
-                { matrix.m00, matrix.m01, matrix.m02, matrix.m03 },
-                { matrix.m10, matrix.m11, matrix.m12, matrix.m13 },
-                { matrix.m20, matrix.m21, matrix.m22, matrix.m23 },
-                { matrix.m30, matrix.m31, matrix.m32, matrix.m33 },
-            };
-            var icol = 0;
-            var irow = 0;
-            for (var i = 0; i < 4; i++)
-            {
-                // Find the largest pivot value
-                var maxPivot = 0.0f;
-                for (var j = 0; j < 4; j++)
-                {
-                    if (pivotIdx[j] != 0)
-                    {
-                        for (var k = 0; k < 4; ++k)
-                        {
-                            if (pivotIdx[k] == -1)
-                            {
-                                var absVal = Math.Abs(inverse[j, k]);
-                                if (absVal > maxPivot)
-                                {
-                                    maxPivot = absVal;
-                                    irow = j;
-                                    icol = k;
-                                }
-                            }
-                            else if (pivotIdx[k] > 0)
-                            {
-                                result = matrix;
-                                return;
-                            }
-                        }
-                    }
-                }
+            float num17 = num11 * num16 - num12 * num15;
+            float num18 = num10 * num16 - num12 * num14;
+            float num19 = num10 * num15 - num11 * num14;
+            float num20 = num9 * num16 - num12 * num13;
+            float num21 = num9 * num15 - num11 * num13;
+            float num22 = num9 * num14 - num10 * num13;
+            float num23 = num6 * num17 - num7 * num18 + num8 * num19;
+            float num24 = -(num5 * num17 - num7 * num20 + num8 * num21);
+            float num25 = num5 * num18 - num6 * num20 + num8 * num22;
+            float num26 = -(num5 * num19 - num6 * num21 + num7 * num22);
+            float num27 = 1.0f / (num1 * num23 + num2 * num24 + num3 * num25 + num4 * num26);
 
-                ++pivotIdx[icol];
-
-                // Swap rows over so pivot is on diagonal
-                if (irow != icol)
-                {
-                    for (var k = 0; k < 4; ++k)
-                    {
-                        var f = inverse[irow, k];
-                        inverse[irow, k] = inverse[icol, k];
-                        inverse[icol, k] = f;
-                    }
-                }
-
-                rowIdx[i] = irow;
-                colIdx[i] = icol;
-
-                var pivot = inverse[icol, icol];
-
-                // check for singular matrix
-                if (pivot == 0.0f)
-                {
-                    throw new InvalidOperationException("Matrix is singular and cannot be inverted.");
-                }
-
-                // Scale row so it has a unit diagonal
-                var oneOverPivot = 1.0f / pivot;
-                inverse[icol, icol] = 1.0f;
-                for (var k = 0; k < 4; ++k)
-                {
-                    inverse[icol, k] *= oneOverPivot;
-                }
-
-                // Do elimination of non-diagonal elements
-                for (var j = 0; j < 4; ++j)
-                {
-                    // check this isn't on the diagonal
-                    if (icol != j)
-                    {
-                        var f = inverse[j, icol];
-                        inverse[j, icol] = 0.0f;
-                        for (var k = 0; k < 4; ++k)
-                        {
-                            inverse[j, k] -= inverse[icol, k] * f;
-                        }
-                    }
-                }
-            }
-
-            for (var j = 3; j >= 0; --j)
-            {
-                var ir = rowIdx[j];
-                var ic = colIdx[j];
-                for (var k = 0; k < 4; ++k)
-                {
-                    var f = inverse[k, ir];
-                    inverse[k, ir] = inverse[k, ic];
-                    inverse[k, ic] = f;
-                }
-            }
-
-            result.m00 = inverse[0, 0];
-            result.m01 = inverse[0, 1];
-            result.m02 = inverse[0, 2];
-            result.m03 = inverse[0, 3];
-            result.m10 = inverse[1, 0];
-            result.m11 = inverse[1, 1];
-            result.m12 = inverse[1, 2];
-            result.m13 = inverse[1, 3];
-            result.m20 = inverse[2, 0];
-            result.m21 = inverse[2, 1];
-            result.m22 = inverse[2, 2];
-            result.m23 = inverse[2, 3];
-            result.m30 = inverse[3, 0];
-            result.m31 = inverse[3, 1];
-            result.m32 = inverse[3, 2];
-            result.m33 = inverse[3, 3];
+            result.m00 = num23 * num27;
+            result.m10 = num24 * num27;
+            result.m20 = num25 * num27;
+            result.m30 = num26 * num27;
+            result.m01 = -(num2 * num17 - num3 * num18 + num4 * num19) * num27;
+            result.m11 = (num1 * num17 - num3 * num20 + num4 * num21) * num27;
+            result.m21 = -(num1 * num18 - num2 * num20 + num4 * num22) * num27;
+            result.m31 = (num1 * num19 - num2 * num21 + num3 * num22) * num27;
+            float num28 = num7 * num16 - num8 * num15;
+            float num29 = num6 * num16 - num8 * num14;
+            float num30 = num6 * num15 - num7 * num14;
+            float num31 = num5 * num16 - num8 * num13;
+            float num32 = num5 * num15 - num7 * num13;
+            float num33 = num5 * num14 - num6 * num13;
+            result.m02 = (num2 * num28 - num3 * num29 + num4 * num30) * num27;
+            result.m12 = -(num1 * num28 - num3 * num31 + num4 * num32) * num27;
+            result.m22 = (num1 * num29 - num2 * num31 + num4 * num33) * num27;
+            result.m32 = -(num1 * num30 - num2 * num32 + num3 * num33) * num27;
+            float num34 = num7 * num12 - num8 * num11;
+            float num35 = num6 * num12 - num8 * num10;
+            float num36 = num6 * num11 - num7 * num10;
+            float num37 = num5 * num12 - num8 * num9;
+            float num38 = num5 * num11 - num7 * num9;
+            float num39 = num5 * num10 - num6 * num9;
+            result.m03 = -(num2 * num34 - num3 * num35 + num4 * num36) * num27;
+            result.m13 = (num1 * num34 - num3 * num37 + num4 * num38) * num27;
+            result.m23 = -(num1 * num35 - num2 * num37 + num4 * num39) * num27;
+            result.m33 = (num1 * num36 - num2 * num38 + num3 * num39) * num27;
         }
 
         /// <summary>
-        /// Creates a new <see cref="Matrix"/> which contains inversion of the specified matrix with high precision.
+        /// Creates a new matrix which contains inversion of the specified matrix with greater precision.
         /// </summary>
-        /// <param name="matrix">Source <see cref="Matrix"/>.</param>
+        /// <param name="matrix">The matrix to inver.</param>
         /// <returns>The inverted matrix.</returns>
         public static Matrix InvertPrecise(Matrix matrix)
         {
@@ -1062,9 +1001,9 @@ namespace Engine
         }
 
         /// <summary>
-        /// Creates a new <see cref="Matrix"/> which contains inversion of the specified matrix with high precision.
+        /// Creates a new matrix which contains inversion of the specified matrix with greater precision.
         /// </summary>
-        /// <param name="matrix">Source <see cref="Matrix"/>.</param>
+        /// <param name="matrix">The matrix to inver.</param>
         /// <param name="result">The inverted matrix as output parameter.</param>
         public static void InvertPrecise(ref Matrix matrix, out Matrix result)
         {
@@ -1085,294 +1024,133 @@ namespace Engine
             double num15 = matrix.m32;
             double num16 = matrix.m33;
 
-            float num17 = (float)(num11 * num16 - num12 * num15);
-            float num18 = (float)(num10 * num16 - num12 * num14);
-            float num19 = (float)(num10 * num15 - num11 * num14);
-            float num20 = (float)(num9 * num16 - num12 * num13);
-            float num21 = (float)(num9 * num15 - num11 * num13);
-            float num22 = (float)(num9 * num14 - num10 * num13);
-            float num23 = (float)(num6 * num17 - num7 * num18 + num8 * num19);
-            float num24 = (float)-(num5 * num17 - num7 * num20 + num8 * num21);
-            float num25 = (float)(num5 * num18 - num6 * num20 + num8 * num22);
-            float num26 = (float)-(num5 * num19 - num6 * num21 + num7 * num22);
-            float num27 = (float)(1.0 / (num1 * num23 + num2 * num24 + num3 * num25 + num4 * num26));
+            double num17 = num11 * num16 - num12 * num15;
+            double num18 = num10 * num16 - num12 * num14;
+            double num19 = num10 * num15 - num11 * num14;
+            double num20 = num9 * num16 - num12 * num13;
+            double num21 = num9 * num15 - num11 * num13;
+            double num22 = num9 * num14 - num10 * num13;
+            double num23 = num6 * num17 - num7 * num18 + num8 * num19;
+            double num24 = -(num5 * num17 - num7 * num20 + num8 * num21);
+            double num25 = num5 * num18 - num6 * num20 + num8 * num22;
+            double num26 = -(num5 * num19 - num6 * num21 + num7 * num22);
+            double num27 = 1.0 / (num1 * num23 + num2 * num24 + num3 * num25 + num4 * num26);
 
-            result.m00 = num23 * num27;
-            result.m10 = num24 * num27;
-            result.m20 = num25 * num27;
-            result.m30 = num26 * num27;
-            result.m01 = (float)-(num2 * num17 - num3 * num18 + num4 * num19) * num27;
-            result.m11 = (float)(num1 * num17 - num3 * num20 + num4 * num21) * num27;
-            result.m21 = (float)-(num1 * num18 - num2 * num20 + num4 * num22) * num27;
-            result.m31 = (float)(num1 * num19 - num2 * num21 + num3 * num22) * num27;
-            float num28 = (float)(num7 * num16 - num8 * num15);
-            float num29 = (float)(num6 * num16 - num8 * num14);
-            float num30 = (float)(num6 * num15 - num7 * num14);
-            float num31 = (float)(num5 * num16 - num8 * num13);
-            float num32 = (float)(num5 * num15 - num7 * num13);
-            float num33 = (float)(num5 * num14 - num6 * num13);
-            result.m02 = (float)(num2 * num28 - num3 * num29 + num4 * num30) * num27;
-            result.m12 = (float)-(num1 * num28 - num3 * num31 + num4 * num32) * num27;
-            result.m22 = (float)(num1 * num29 - num2 * num31 + num4 * num33) * num27;
-            result.m32 = (float)-(num1 * num30 - num2 * num32 + num3 * num33) * num27;
-            float num34 = (float)(num7 * num12 - num8 * num11);
-            float num35 = (float)(num6 * num12 - num8 * num10);
-            float num36 = (float)(num6 * num11 - num7 * num10);
-            float num37 = (float)(num5 * num12 - num8 * num9);
-            float num38 = (float)(num5 * num11 - num7 * num9);
-            float num39 = (float)(num5 * num10 - num6 * num9);
-            result.m03 = (float)-(num2 * num34 - num3 * num35 + num4 * num36) * num27;
-            result.m13 = (float)(num1 * num34 - num3 * num37 + num4 * num38) * num27;
-            result.m23 = (float)-(num1 * num35 - num2 * num37 + num4 * num39) * num27;
-            result.m33 = (float)(num1 * num36 - num2 * num38 + num3 * num39) * num27;
+            result.m00 = (float)(num23 * num27);
+            result.m10 = (float)(num24 * num27);
+            result.m20 = (float)(num25 * num27);
+            result.m30 = (float)(num26 * num27);
+            result.m01 = (float)(-(num2 * num17 - num3 * num18 + num4 * num19) * num27);
+            result.m11 = (float)((num1 * num17 - num3 * num20 + num4 * num21) * num27);
+            result.m21 = (float)(-(num1 * num18 - num2 * num20 + num4 * num22) * num27);
+            result.m31 = (float)((num1 * num19 - num2 * num21 + num3 * num22) * num27);
+            double num28 = num7 * num16 - num8 * num15;
+            double num29 = num6 * num16 - num8 * num14;
+            double num30 = num6 * num15 - num7 * num14;
+            double num31 = num5 * num16 - num8 * num13;
+            double num32 = num5 * num15 - num7 * num13;
+            double num33 = num5 * num14 - num6 * num13;
+            result.m02 = (float)((num2 * num28 - num3 * num29 + num4 * num30) * num27);
+            result.m12 = (float)(-(num1 * num28 - num3 * num31 + num4 * num32) * num27);
+            result.m22 = (float)((num1 * num29 - num2 * num31 + num4 * num33) * num27);
+            result.m32 = (float)(-(num1 * num30 - num2 * num32 + num3 * num33) * num27);
+            double num34 = num7 * num12 - num8 * num11;
+            double num35 = num6 * num12 - num8 * num10;
+            double num36 = num6 * num11 - num7 * num10;
+            double num37 = num5 * num12 - num8 * num9;
+            double num38 = num5 * num11 - num7 * num9;
+            double num39 = num5 * num10 - num6 * num9;
+            result.m03 = (float)(-(num2 * num34 - num3 * num35 + num4 * num36) * num27);
+            result.m13 = (float)((num1 * num34 - num3 * num37 + num4 * num38) * num27);
+            result.m23 = (float)(-(num1 * num35 - num2 * num37 + num4 * num39) * num27);
+            result.m33 = (float)((num1 * num36 - num2 * num38 + num3 * num39) * num27);
         }
 
-        /*
         /// <summary>
-        /// Creates a new <see cref="Matrix"/> for spherical billboarding that rotates around specified object position.
+        /// Creates a new matrix for spherical billboarding.
         /// </summary>
-        /// <param name="objectPosition">Position of billboard object. It will rotate around that vector.</param>
-        /// <param name="cameraPosition">The camera position.</param>
-        /// <param name="cameraUpVector">The camera up vector.</param>
-        /// <param name="cameraForwardVector">Optional camera forward vector.</param>
-        /// <returns>The <see cref="Matrix"/> for spherical billboarding.</returns>
-        public static Matrix CreateBillboard(Vector3 objectPosition, Vector3 cameraPosition,
-            Vector3 cameraUpVector, Vector3? cameraForwardVector)
+        /// <param name="position">Position of billboard object.</param>
+        /// <param name="targetDirection">The direction to face along.</param>
+        /// <param name="up">The upwards direction.</param>
+        public static Matrix CreateBillboard(Vector3 position, Vector3 targetDirection, Vector3 up)
         {
-
-            // Delegate to the other overload of the function to do the work
-            CreateBillboard(ref objectPosition, ref cameraPosition, ref cameraUpVector, cameraForwardVector, out Matrix result);
-
+            CreateBillboard(ref position, ref targetDirection, ref up, out Matrix result);
             return result;
         }
 
         /// <summary>
-        /// Creates a new <see cref="Matrix"/> for spherical billboarding that rotates around specified object position.
+        /// Creates a new matrix for spherical billboarding.
         /// </summary>
-        /// <param name="objectPosition">Position of billboard object. It will rotate around that vector.</param>
-        /// <param name="cameraPosition">The camera position.</param>
-        /// <param name="cameraUpVector">The camera up vector.</param>
-        /// <param name="cameraForwardVector">Optional camera forward vector.</param>
-        /// <param name="result">The <see cref="Matrix"/> for spherical billboarding as an output parameter.</param>
-        public static void CreateBillboard(ref Vector3 objectPosition, ref Vector3 cameraPosition,
-            ref Vector3 cameraUpVector, Vector3? cameraForwardVector, out Matrix result)
+        /// <param name="position">Position of billboard object.</param>
+        /// <param name="targetDirection">The direction to face along.</param>
+        /// <param name="up">The camera up vector.</param>
+        /// <param name="result">The result as an output parameter.</param>
+        public static void CreateBillboard(ref Vector3 position, ref Vector3 targetDirection, ref Vector3 up, out Matrix result)
         {
-            Vector3 vector;
-            vector.x = objectPosition.x - cameraPosition.x;
-            vector.y = objectPosition.y - cameraPosition.y;
-            vector.z = objectPosition.z - cameraPosition.z;
-            float num = vector.LengthSquared();
-            if (num < 0.0001f)
-            {
-                vector = cameraForwardVector.HasValue ? -cameraForwardVector.Value : Vector3.Forward;
-            }
-            else
-            {
-                Vector3.Multiply(ref vector, 1f / ((float)Math.Sqrt(num)), out vector);
-            }
-            Vector3.Cross(ref cameraUpVector, ref vector, out Vector3 vector3);
-            vector3.Normalize();
-            Vector3.Cross(ref vector, ref vector3, out Vector3 vector2);
-            result.m00 = vector3.x;
-            result.m01 = vector3.y;
-            result.m02 = vector3.z;
-            result.m03 = 0;
-            result.m10 = vector2.x;
-            result.m11 = vector2.y;
-            result.m12 = vector2.z;
-            result.m13 = 0;
-            result.m20 = vector.x;
-            result.m21 = vector.y;
-            result.m22 = vector.z;
-            result.m23 = 0;
-            result.m30 = objectPosition.x;
-            result.m31 = objectPosition.y;
-            result.m32 = objectPosition.z;
-            result.m33 = 1;
-        }
+            Vector3 f = -targetDirection;
+            Vector3 u = up;
 
-        /// <summary>
-        /// Creates a new <see cref="Matrix"/> for cylindrical billboarding that rotates around specified axis.
-        /// </summary>
-        /// <param name="objectPosition">Object position the billboard will rotate around.</param>
-        /// <param name="cameraPosition">Camera position.</param>
-        /// <param name="rotateAxis">Axis of billboard for rotation.</param>
-        /// <param name="cameraForwardVector">Optional camera forward vector.</param>
-        /// <param name="objectForwardVector">Optional object forward vector.</param>
-        /// <returns>The <see cref="Matrix"/> for cylindrical billboarding.</returns>
-        public static Matrix CreateConstrainedBillboard(Vector3 objectPosition, Vector3 cameraPosition,
-            Vector3 rotateAxis, Nullable<Vector3> cameraForwardVector, Nullable<Vector3> objectForwardVector)
-        {
-            CreateConstrainedBillboard(ref objectPosition, ref cameraPosition, ref rotateAxis,
-                cameraForwardVector, objectForwardVector, out Matrix result);
-            return result;
-        }
-
-        /// <summary>
-        /// Creates a new <see cref="Matrix"/> for cylindrical billboarding that rotates around specified axis.
-        /// </summary>
-        /// <param name="objectPosition">Object position the billboard will rotate around.</param>
-        /// <param name="cameraPosition">Camera position.</param>
-        /// <param name="rotateAxis">Axis of billboard for rotation.</param>
-        /// <param name="cameraForwardVector">Optional camera forward vector.</param>
-        /// <param name="objectForwardVector">Optional object forward vector.</param>
-        /// <param name="result">The <see cref="Matrix"/> for cylindrical billboarding as an output parameter.</param>
-        public static void CreateConstrainedBillboard(ref Vector3 objectPosition, ref Vector3 cameraPosition,
-            ref Vector3 rotateAxis, Vector3? cameraForwardVector, Vector3? objectForwardVector, out Matrix result)
-        {
-            Vector3 vector;
-            Vector3 vector2;
-            Vector3 vector3;
-            vector2.x = objectPosition.x - cameraPosition.x;
-            vector2.y = objectPosition.y - cameraPosition.y;
-            vector2.z = objectPosition.z - cameraPosition.z;
-            float num2 = vector2.LengthSquared();
-            if (num2 < 0.0001f)
-            {
-                vector2 = cameraForwardVector.HasValue ? -cameraForwardVector.Value : Vector3.Forward;
-            }
-            else
-            {
-                Vector3.Multiply(ref vector2, 1f / ((float)Math.Sqrt(num2)), out vector2);
-            }
-            Vector3 vector4 = rotateAxis;
-            Vector3.Dot(ref rotateAxis, ref vector2, out float num);
-            if (Math.Abs(num) > 0.9982547f)
-            {
-                if (objectForwardVector.HasValue)
-                {
-                    vector = objectForwardVector.Value;
-                    Vector3.Dot(ref rotateAxis, ref vector, out num);
-                    if (Math.Abs(num) > 0.9982547f)
-                    {
-                        num = ((rotateAxis.x * Vector3.Forward.x) + (rotateAxis.y * Vector3.Forward.y)) + (rotateAxis.z * Vector3.Forward.z);
-                        vector = (Math.Abs(num) > 0.9982547f) ? Vector3.Right : Vector3.Forward;
-                    }
-                }
-                else
-                {
-                    num = ((rotateAxis.x * Vector3.Forward.x) + (rotateAxis.y * Vector3.Forward.y)) + (rotateAxis.z * Vector3.Forward.z);
-                    vector = (Math.Abs(num) > 0.9982547f) ? Vector3.Right : Vector3.Forward;
-                }
-                Vector3.Cross(ref rotateAxis, ref vector, out vector3);
-                vector3.Normalize();
-                Vector3.Cross(ref vector3, ref rotateAxis, out vector);
-                vector.Normalize();
-            }
-            else
-            {
-                Vector3.Cross(ref rotateAxis, ref vector2, out vector3);
-                vector3.Normalize();
-                Vector3.Cross(ref vector3, ref vector4, out vector);
-                vector.Normalize();
-            }
-            result.m00 = vector3.x;
-            result.m01 = vector3.y;
-            result.m02 = vector3.z;
-            result.m03 = 0;
-            result.m10 = vector4.x;
-            result.m11 = vector4.y;
-            result.m12 = vector4.z;
-            result.m13 = 0;
-            result.m20 = vector.x;
-            result.m21 = vector.y;
-            result.m22 = vector.z;
-            result.m23 = 0;
-            result.m30 = objectPosition.x;
-            result.m31 = objectPosition.y;
-            result.m32 = objectPosition.z;
-            result.m33 = 1;
-
-        }
-
-        /// <summary>
-        /// Creates a new <see cref="Matrix"/> which contains the rotation moment around specified axis.
-        /// </summary>
-        /// <param name="axis">The axis of rotation.</param>
-        /// <param name="angle">The angle of rotation in radians.</param>
-        /// <returns>The rotation <see cref="Matrix"/>.</returns>
-        public static Matrix CreateFromAxisAngle(Vector3 axis, float angle)
-        {
-            CreateFromAxisAngle(ref axis, angle, out Matrix result);
-            return result;
-        }
-
-        /// <summary>
-        /// Creates a new <see cref="Matrix"/> which contains the rotation moment around specified axis.
-        /// </summary>
-        /// <param name="axis">The axis of rotation.</param>
-        /// <param name="angle">The angle of rotation in radians.</param>
-        /// <param name="result">The rotation <see cref="Matrix"/> as an output parameter.</param>
-        public static void CreateFromAxisAngle(ref Vector3 axis, float angle, out Matrix result)
-        {
-            float x = axis.x;
-            float y = axis.y;
-            float z = axis.z;
-            float num2 = (float)Math.Sin(angle);
-            float num = (float)Math.Cos(angle);
-            float num11 = x * x;
-            float num10 = y * y;
-            float num9 = z * z;
-            float num8 = x * y;
-            float num7 = x * z;
-            float num6 = y * z;
-            result.m00 = num11 + (num * (1f - num11));
-            result.m01 = (num8 - (num * num8)) + (num2 * z);
-            result.m02 = (num7 - (num * num7)) - (num2 * y);
-            result.m03 = 0;
-            result.m10 = (num8 - (num * num8)) - (num2 * z);
-            result.m11 = num10 + (num * (1f - num10));
-            result.m12 = (num6 - (num * num6)) + (num2 * x);
-            result.m13 = 0;
-            result.m20 = (num7 - (num * num7)) + (num2 * y);
-            result.m21 = (num6 - (num * num6)) - (num2 * x);
-            result.m22 = num9 + (num * (1f - num9));
-            result.m23 = 0;
-            result.m30 = 0;
-            result.m31 = 0;
-            result.m32 = 0;
-            result.m33 = 1;
-        }
-
-        /// <summary>
-        /// Creates a new rotation <see cref="Matrix"/> from a <see cref="Quaternion"/>.
-        /// </summary>
-        /// <param name="quaternion"><see cref="Quaternion"/> of rotation moment.</param>
-        /// <returns>The rotation <see cref="Matrix"/>.</returns>
-        public static Matrix CreateFromQuaternion(Quaternion quaternion)
-        {
-            CreateFromQuaternion(ref quaternion, out Matrix result);
-            return result;
-        }
-
-        /// <summary>
-        /// Creates a new rotation <see cref="Matrix"/> from a <see cref="Quaternion"/>.
-        /// </summary>
-        /// <param name="quaternion"><see cref="Quaternion"/> of rotation moment.</param>
-        /// <param name="result">The rotation <see cref="Matrix"/> as an output parameter.</param>
-        public static void CreateFromQuaternion(ref Quaternion quaternion, out Matrix result)
-        {
-            float num9 = quaternion.x * quaternion.x;
-            float num8 = quaternion.y * quaternion.y;
-            float num7 = quaternion.z * quaternion.z;
-            float num6 = quaternion.x * quaternion.y;
-            float num5 = quaternion.z * quaternion.w;
-            float num4 = quaternion.z * quaternion.x;
-            float num3 = quaternion.y * quaternion.w;
-            float num2 = quaternion.y * quaternion.z;
-            float num = quaternion.x * quaternion.w;
-            result.m00 = 1f - (2f * (num8 + num7));
-            result.m01 = 2f * (num6 + num5);
-            result.m02 = 2f * (num4 - num3);
+            Vector3.OrthoNormalize(ref f, ref u, out Vector3 r);
+            
+            result.m00 = r.x;
+            result.m01 = r.y;
+            result.m02 = r.z;
             result.m03 = 0f;
-            result.m10 = 2f * (num6 - num5);
-            result.m11 = 1f - (2f * (num7 + num9));
-            result.m12 = 2f * (num2 + num);
+
+            result.m10 = u.x;
+            result.m11 = u.y;
+            result.m12 = u.z;
             result.m13 = 0f;
-            result.m20 = 2f * (num4 + num3);
-            result.m21 = 2f * (num2 - num);
-            result.m22 = 1f - (2f * (num8 + num9));
+
+            result.m20 = f.x;
+            result.m21 = f.y;
+            result.m22 = f.z;
             result.m23 = 0f;
+
+            result.m30 = position.x;
+            result.m31 = position.y;
+            result.m32 = position.z;
+            result.m33 = 1f;
+        }
+
+        /// <summary>
+        /// Creates a new rotation matrix.
+        /// </summary>
+        /// <param name="direction">The direction to look along.</param>
+        /// <param name="up">The direction of the upper edge of the camera.</param>
+        public static Matrix CreateLookAt(Vector3 direction, Vector3 up)
+        {
+            CreateLookAt(ref direction, ref up, out Matrix matrix);
+            return matrix;
+        }
+
+        /// <summary>
+        /// Creates a new rotation matrix.
+        /// </summary>
+        /// <param name="direction">The direction to look along.</param>
+        /// <param name="up">The direction of the upper edge of the camera.</param>
+        /// <param name="result">The viewing <see cref="Matrix"/> as an output parameter.</param>
+        public static void CreateLookAt(ref Vector3 direction, ref Vector3 up, out Matrix result)
+        {
+            Vector3 f = direction;
+            Vector3 u = up;
+            Vector3.OrthoNormalize(ref f, ref u, out Vector3 r);
+
+            result.m00 = u.x;
+            result.m01 = r.x;
+            result.m02 = f.x;
+            result.m03 = 0f;
+
+            result.m10 = u.y;
+            result.m11 = r.y;
+            result.m12 = f.y;
+            result.m13 = 0f;
+
+            result.m20 = u.z;
+            result.m21 = r.z;
+            result.m22 = f.z;
+            result.m23 = 0f;
+
             result.m30 = 0f;
             result.m31 = 0f;
             result.m32 = 0f;
@@ -1380,608 +1158,508 @@ namespace Engine
         }
 
         /// <summary>
-        /// Creates a new rotation <see cref="Matrix"/> from the specified yaw, pitch and roll values.
+        /// Creates a new rotation matrix.
         /// </summary>
-        /// <param name="yaw">The yaw rotation value in radians.</param>
-        /// <param name="pitch">The pitch rotation value in radians.</param>
-        /// <param name="roll">The roll rotation value in radians.</param>
-        /// <returns>The rotation <see cref="Matrix"/>.</returns>
-        /// <remarks>For more information about yaw, pitch and roll visit http://en.wikipedia.org/wiki/Euler_angles.
-        /// </remarks>
-		public static Matrix CreateFromYawPitchRoll(float yaw, float pitch, float roll)
+        /// <param name="axis">The axis of rotation.</param>
+        /// <param name="angle">The angle of rotation in radians.</param>
+        public static Matrix CreateFromAxisAngle(Vector3 axis, float angle)
         {
-            CreateFromYawPitchRoll(yaw, pitch, roll, out Matrix matrix);
-            return matrix;
+            CreateFromAxisAngle(ref axis, angle, out Matrix result);
+            return result;
         }
 
         /// <summary>
-        /// Creates a new rotation <see cref="Matrix"/> from the specified yaw, pitch and roll values.
+        /// Creates a new rotation matrix.
         /// </summary>
-        /// <param name="yaw">The yaw rotation value in radians.</param>
-        /// <param name="pitch">The pitch rotation value in radians.</param>
-        /// <param name="roll">The roll rotation value in radians.</param>
-        /// <param name="result">The rotation <see cref="Matrix"/> as an output parameter.</param>
-        /// <remarks>For more information about yaw, pitch and roll visit http://en.wikipedia.org/wiki/Euler_angles.
-        /// </remarks>
-		public static void CreateFromYawPitchRoll(float yaw, float pitch, float roll, out Matrix result)
+        /// <param name="axis">The axis of rotation.</param>
+        /// <param name="angle">The angle of rotation in radians.</param>
+        /// <param name="result">The result as an output parameter.</param>
+        public static void CreateFromAxisAngle(ref Vector3 axis, float angle, out Matrix result)
         {
-            Quaternion.CreateFromYawPitchRoll(yaw, pitch, roll, out Quaternion quaternion);
-            CreateFromQuaternion(ref quaternion, out result);
+            Vector3.Normalize(ref axis, out Vector3 a);
+
+            float xx = a.x * a.x;
+            float xy = a.x * a.y;
+
+            float yy = a.y * a.y;
+            float yz = a.y * a.z;
+
+            float zz = a.z * a.z;
+            float xz = a.x * a.z;
+
+            float sin = (float)Math.Sin(angle);
+            float cos = (float)Math.Cos(angle);
+
+            result.m00 = xx + (cos * (1f - xx));
+            result.m01 = xy - (cos * xy) + (sin * a.z);
+            result.m02 = xz - (cos * xz) - (sin * a.y);
+            result.m03 = 0;
+
+            result.m10 = xy - (cos * xy) - (sin * a.z);
+            result.m11 = yy + (cos * (1f - yy));
+            result.m12 = yz - (cos * yz) + (sin * a.x);
+            result.m13 = 0;
+
+            result.m20 = xz - (cos * xz) + (sin * a.y);
+            result.m21 = yz - (cos * yz) - (sin * a.x);
+            result.m22 = zz + (cos * (1f - zz));
+            result.m23 = 0;
+
+            result.m30 = 0;
+            result.m31 = 0;
+            result.m32 = 0;
+            result.m33 = 1;
         }
 
         /// <summary>
-        /// Creates a new viewing <see cref="Matrix"/>.
+        /// Creates a new rotation matrix.
         /// </summary>
-        /// <param name="cameraPosition">Position of the camera.</param>
-        /// <param name="cameraTarget">Lookup vector of the camera.</param>
-        /// <param name="cameraUpVector">The direction of the upper edge of the camera.</param>
-        /// <returns>The viewing <see cref="Matrix"/>.</returns>
-        public static Matrix CreateLookAt(Vector3 cameraPosition, Vector3 cameraTarget, Vector3 cameraUpVector)
+        /// <param name="q">The rotation.</param>
+        public static Matrix CreateFromQuaternion(Quaternion q)
         {
-            CreateLookAt(ref cameraPosition, ref cameraTarget, ref cameraUpVector, out Matrix matrix);
-            return matrix;
+            CreateFromQuaternion(ref q, out Matrix result);
+            return result;
         }
 
         /// <summary>
-        /// Creates a new viewing <see cref="Matrix"/>.
+        /// Creates a new rotation matrix.
         /// </summary>
-        /// <param name="cameraPosition">Position of the camera.</param>
-        /// <param name="cameraTarget">Lookup vector of the camera.</param>
-        /// <param name="cameraUpVector">The direction of the upper edge of the camera.</param>
-        /// <param name="result">The viewing <see cref="Matrix"/> as an output parameter.</param>
-        public static void CreateLookAt(ref Vector3 cameraPosition, ref Vector3 cameraTarget, ref Vector3 cameraUpVector, out Matrix result)
+        /// <param name="q">The rotation.</param>
+        /// <param name="result">The result as an output parameter.</param>
+        public static void CreateFromQuaternion(ref Quaternion q, out Matrix result)
         {
-            var vector = Vector3.Normalize(cameraPosition - cameraTarget);
-            var vector2 = Vector3.Normalize(Vector3.Cross(cameraUpVector, vector));
-            var vector3 = Vector3.Cross(vector, vector2);
-            result.m00 = vector2.x;
-            result.m01 = vector3.x;
-            result.m02 = vector.x;
+            float xx = q.x * q.x;
+            float xy = q.x * q.y;
+            float xz = q.z * q.x;
+            float xw = q.x * q.w;
+
+            float yy = q.y * q.y;
+            float yz = q.y * q.z;
+            float yw = q.y * q.w;
+
+            float zz = q.z * q.z;
+            float zw = q.z * q.w;
+
+            result.m00 = 1f - (2f * (yy + zz));
+            result.m01 = 2f * (xy + zw);
+            result.m02 = 2f * (xz - yw);
             result.m03 = 0f;
-            result.m10 = vector2.y;
-            result.m11 = vector3.y;
-            result.m12 = vector.y;
+
+            result.m10 = 2f * (xy - zw);
+            result.m11 = 1f - (2f * (xx + zz));
+            result.m12 = 2f * (yz + xw);
             result.m13 = 0f;
-            result.m20 = vector2.z;
-            result.m21 = vector3.z;
-            result.m22 = vector.z;
+
+            result.m20 = 2f * (xz + yw);
+            result.m21 = 2f * (yz - xw);
+            result.m22 = 1f - (2f * (xx + yy));
             result.m23 = 0f;
-            result.m30 = -Vector3.Dot(vector2, cameraPosition);
-            result.m31 = -Vector3.Dot(vector3, cameraPosition);
-            result.m32 = -Vector3.Dot(vector, cameraPosition);
+
+            result.m30 = 0f;
+            result.m31 = 0f;
+            result.m32 = 0f;
             result.m33 = 1f;
         }
 
         /// <summary>
-        /// Creates a new projection <see cref="Matrix"/> for orthographic view.
+        /// Creates a new projection matrix for an orthographic view.
         /// </summary>
         /// <param name="width">Width of the viewing volume.</param>
         /// <param name="height">Height of the viewing volume.</param>
-        /// <param name="zNearPlane">Depth of the near plane.</param>
-        /// <param name="zFarPlane">Depth of the far plane.</param>
-        /// <returns>The new projection <see cref="Matrix"/> for orthographic view.</returns>
-        public static Matrix CreateOrthographic(float width, float height, float zNearPlane, float zFarPlane)
+        /// <param name="near">Depth of the near plane.</param>
+        /// <param name="far">Depth of the far plane.</param>
+        public static Matrix CreateOrthographic(float width, float height, float near, float far)
         {
-            CreateOrthographic(width, height, zNearPlane, zFarPlane, out Matrix matrix);
+            CreateOrthographic(width, height, near, far, out Matrix matrix);
             return matrix;
         }
 
         /// <summary>
-        /// Creates a new projection <see cref="Matrix"/> for orthographic view.
+        /// Creates a new projection matrix for an orthographic view.
         /// </summary>
         /// <param name="width">Width of the viewing volume.</param>
         /// <param name="height">Height of the viewing volume.</param>
-        /// <param name="zNearPlane">Depth of the near plane.</param>
-        /// <param name="zFarPlane">Depth of the far plane.</param>
-        /// <param name="result">The new projection <see cref="Matrix"/> for orthographic view as an output parameter.</param>
-        public static void CreateOrthographic(float width, float height, float zNearPlane, float zFarPlane, out Matrix result)
+        /// <param name="near">Depth of the near plane.</param>
+        /// <param name="far">Depth of the far plane.</param>
+        /// <param name="result">The result as an output parameter.</param>
+        public static void CreateOrthographic(float width, float height, float near, float far, out Matrix result)
         {
             result.m00 = 2f / width;
-            result.m01 = result.m02 = result.m03 = 0f;
+            result.m01 = 0f;
+            result.m02 = 0f;
+            result.m03 = 0f;
+
+            result.m10 = 0f;
             result.m11 = 2f / height;
-            result.m10 = result.m12 = result.m13 = 0f;
-            result.m22 = 1f / (zNearPlane - zFarPlane);
-            result.m20 = result.m21 = result.m23 = 0f;
-            result.m30 = result.m31 = 0f;
-            result.m32 = zNearPlane / (zNearPlane - zFarPlane);
+            result.m12 = 0f;
+            result.m13 = 0f;
+
+            result.m20 = 0f;
+            result.m21 = 0f;
+            result.m22 = -2f / (far - near);
+            result.m23 = 0f;
+
+            result.m30 = 0f;
+            result.m31 = 0f;
+            result.m32 = -(far + near) / (far - near);
             result.m33 = 1f;
         }
 
         /// <summary>
-        /// Creates a new projection <see cref="Matrix"/> for customized orthographic view.
+        /// Creates a new projection matrix for a customized orthographic view.
         /// </summary>
-        /// <param name="left">Lower x-value at the near plane.</param>
-        /// <param name="right">Upper x-value at the near plane.</param>
-        /// <param name="bottom">Lower y-coordinate at the near plane.</param>
-        /// <param name="top">Upper y-value at the near plane.</param>
-        /// <param name="zNearPlane">Depth of the near plane.</param>
-        /// <param name="zFarPlane">Depth of the far plane.</param>
-        /// <returns>The new projection <see cref="Matrix"/> for customized orthographic view.</returns>
-        public static Matrix CreateOrthographicOffCenter(float left, float right, float bottom, float top, float zNearPlane, float zFarPlane)
+        /// <param name="left">Lower x coordinate at the near plane.</param>
+        /// <param name="right">Upper x coordinate at the near plane.</param>
+        /// <param name="bottom">Lower y coordinate at the near plane.</param>
+        /// <param name="top">Upper y coordinate at the near plane.</param>
+        /// <param name="near">Depth of the near plane.</param>
+        /// <param name="far">Depth of the far plane.</param>
+        public static Matrix CreateOrthographicOffCenter(float left, float right, float bottom, float top, float near, float far)
         {
-            CreateOrthographicOffCenter(left, right, bottom, top, zNearPlane, zFarPlane, out Matrix matrix);
+            CreateOrthographicOffCenter(left, right, bottom, top, near, far, out Matrix matrix);
             return matrix;
         }
 
         /// <summary>
-        /// Creates a new projection <see cref="Matrix"/> for customized orthographic view.
+        /// Creates a new projection matrix for a customized orthographic view.
         /// </summary>
-        /// <param name="viewingVolume">The viewing volume.</param>
-        /// <param name="zNearPlane">Depth of the near plane.</param>
-        /// <param name="zFarPlane">Depth of the far plane.</param>
-        /// <returns>The new projection <see cref="Matrix"/> for customized orthographic view.</returns>
-        public static Matrix CreateOrthographicOffCenter(Rectangle viewingVolume, float zNearPlane, float zFarPlane)
+        /// <param name="volume">The viewing volume.</param>
+        /// <param name="near">Depth of the near plane.</param>
+        /// <param name="far">Depth of the far plane.</param>
+        public static Matrix CreateOrthographicOffCenter(Rect volume, float near, float far)
         {
-            CreateOrthographicOffCenter(viewingVolume.Left, viewingVolume.Right, viewingVolume.Bottom, viewingVolume.Top, zNearPlane, zFarPlane, out Matrix matrix);
+            CreateOrthographicOffCenter(volume.xMin, volume.xMax, volume.yMin, volume.yMax, near, far, out Matrix matrix);
             return matrix;
         }
 
         /// <summary>
-        /// Creates a new projection <see cref="Matrix"/> for customized orthographic view.
+        /// Creates a new projection matrix for a customized orthographic view.
         /// </summary>
-        /// <param name="left">Lower x-value at the near plane.</param>
-        /// <param name="right">Upper x-value at the near plane.</param>
-        /// <param name="bottom">Lower y-coordinate at the near plane.</param>
-        /// <param name="top">Upper y-value at the near plane.</param>
-        /// <param name="zNearPlane">Depth of the near plane.</param>
-        /// <param name="zFarPlane">Depth of the far plane.</param>
-        /// <param name="result">The new projection <see cref="Matrix"/> for customized orthographic view as an output parameter.</param>
-        public static void CreateOrthographicOffCenter(float left, float right, float bottom, float top, float zNearPlane, float zFarPlane, out Matrix result)
+        /// <param name="left">Lower x coordinate at the near plane.</param>
+        /// <param name="right">Upper x coordinate at the near plane.</param>
+        /// <param name="bottom">Lower y coordinate at the near plane.</param>
+        /// <param name="top">Upper y coordinate at the near plane.</param>
+        /// <param name="near">Depth of the near plane.</param>
+        /// <param name="far">Depth of the far plane.</param>
+        public static void CreateOrthographicOffCenter(float left, float right, float bottom, float top, float near, float far, out Matrix result)
         {
-            result.m00 = (float)(2.0 / (right - (double)left));
-            result.m01 = 0.0f;
-            result.m02 = 0.0f;
-            result.m03 = 0.0f;
-            result.m10 = 0.0f;
-            result.m11 = (float)(2.0 / (top - (double)bottom));
-            result.m12 = 0.0f;
-            result.m13 = 0.0f;
-            result.m20 = 0.0f;
-            result.m21 = 0.0f;
-            result.m22 = (float)(1.0 / (zNearPlane - (double)zFarPlane));
-            result.m23 = 0.0f;
-            result.m30 = (float)((left + (double)right) / (left - (double)right));
-            result.m31 = (float)((top + (double)bottom) / (bottom - (double)top));
-            result.m32 = (float)(zNearPlane / (zNearPlane - (double)zFarPlane));
-            result.m33 = 1.0f;
+            result.m00 = 2f / (right - left);
+            result.m01 = 0f;
+            result.m02 = 0f;
+            result.m03 = 0f;
+
+            result.m10 = 0f;
+            result.m11 = 2f / (top - bottom);
+            result.m12 = 0f;
+            result.m13 = 0f;
+
+            result.m20 = 0f;
+            result.m21 = 0f;
+            result.m22 = -2f / (far - near);
+            result.m23 = 0f;
+
+            result.m30 = -(right + left) / (right - left);
+            result.m31 = -(top + bottom) / (top - bottom);
+            result.m32 = -(far + near) / (far - near);
+            result.m33 = 1f;
         }
 
         /// <summary>
-        /// Creates a new projection <see cref="Matrix"/> for perspective view.
+        /// Creates a new projection matrix for a perspective view.
         /// </summary>
         /// <param name="width">Width of the viewing volume.</param>
         /// <param name="height">Height of the viewing volume.</param>
-        /// <param name="nearPlaneDistance">Distance to the near plane.</param>
-        /// <param name="farPlaneDistance">Distance to the far plane.</param>
-        /// <returns>The new projection <see cref="Matrix"/> for perspective view.</returns>
-        public static Matrix CreatePerspective(float width, float height, float nearPlaneDistance, float farPlaneDistance)
+        /// <param name="near">Distance to the near plane.</param>
+        /// <param name="far">Distance to the far plane.</param>
+        public static Matrix CreatePerspective(float width, float height, float near, float far)
         {
-            CreatePerspective(width, height, nearPlaneDistance, farPlaneDistance, out Matrix matrix);
+            CreatePerspective(width, height, near, far, out Matrix matrix);
             return matrix;
         }
 
         /// <summary>
-        /// Creates a new projection <see cref="Matrix"/> for perspective view.
+        /// Creates a new projection matrix for a perspective view.
         /// </summary>
         /// <param name="width">Width of the viewing volume.</param>
         /// <param name="height">Height of the viewing volume.</param>
-        /// <param name="nearPlaneDistance">Distance to the near plane.</param>
-        /// <param name="farPlaneDistance">Distance to the far plane.</param>
-        /// <param name="result">The new projection <see cref="Matrix"/> for perspective view as an output parameter.</param>
-        public static void CreatePerspective(float width, float height, float nearPlaneDistance, float farPlaneDistance, out Matrix result)
+        /// <param name="near">Distance to the near plane.</param>
+        /// <param name="far">Distance to the far plane.</param>
+        /// <param name="result">The result as an output parameter.</param>
+        public static void CreatePerspective(float width, float height, float near, float far, out Matrix result)
         {
-            if (nearPlaneDistance <= 0f)
-            {
-                throw new ArgumentException("nearPlaneDistance <= 0");
-            }
-            if (farPlaneDistance <= 0f)
-            {
-                throw new ArgumentException("farPlaneDistance <= 0");
-            }
-            if (nearPlaneDistance >= farPlaneDistance)
-            {
-                throw new ArgumentException("nearPlaneDistance >= farPlaneDistance");
-            }
-            result.m00 = (2f * nearPlaneDistance) / width;
-            result.m01 = result.m02 = result.m03 = 0f;
-            result.m11 = (2f * nearPlaneDistance) / height;
-            result.m10 = result.m12 = result.m13 = 0f;
-            result.m22 = farPlaneDistance / (nearPlaneDistance - farPlaneDistance);
-            result.m20 = result.m21 = 0f;
+            result.m00 = (2f * near) / width;
+            result.m01 = 0f;
+            result.m02 = 0f;
+            result.m03 = 0f;
+
+            result.m10 = 0f;
+            result.m11 = (2f * near) / height;
+            result.m12 = 0f;
+            result.m13 = 0f;
+
+            result.m20 = 0f;
+            result.m21 = 0f;
+            result.m22 = -(far + near) / (far - near);
             result.m23 = -1f;
-            result.m30 = result.m31 = result.m33 = 0f;
-            result.m32 = (nearPlaneDistance * farPlaneDistance) / (nearPlaneDistance - farPlaneDistance);
+
+            result.m30 = 0f;
+            result.m31 = 0f;
+            result.m32 = (-2f * far * near) / (far - near);
+            result.m33 = 0f;
         }
 
         /// <summary>
-        /// Creates a new projection <see cref="Matrix"/> for perspective view with field of view.
+        /// Creates a new projection matrix for a perspective view.
         /// </summary>
         /// <param name="fieldOfView">Field of view in the y direction in radians.</param>
         /// <param name="aspectRatio">Width divided by height of the viewing volume.</param>
-        /// <param name="nearPlaneDistance">Distance to the near plane.</param>
-        /// <param name="farPlaneDistance">Distance to the far plane.</param>
-        /// <returns>The new projection <see cref="Matrix"/> for perspective view with FOV.</returns>
-        public static Matrix CreatePerspectiveFieldOfView(float fieldOfView, float aspectRatio, float nearPlaneDistance, float farPlaneDistance)
+        /// <param name="near">Distance to the near plane.</param>
+        /// <param name="far">Distance to the far plane.</param>
+        public static Matrix CreatePerspectiveFieldOfView(float fieldOfView, float aspectRatio, float near, float far)
         {
-            CreatePerspectiveFieldOfView(fieldOfView, aspectRatio, nearPlaneDistance, farPlaneDistance, out Matrix result);
+            CreatePerspectiveFieldOfView(fieldOfView, aspectRatio, near, far, out Matrix result);
             return result;
         }
 
         /// <summary>
-        /// Creates a new projection <see cref="Matrix"/> for perspective view with field of view.
+        /// Creates a new projection matrix for a perspective view.
         /// </summary>
         /// <param name="fieldOfView">Field of view in the y direction in radians.</param>
         /// <param name="aspectRatio">Width divided by height of the viewing volume.</param>
-        /// <param name="nearPlaneDistance">Distance of the near plane.</param>
-        /// <param name="farPlaneDistance">Distance of the far plane.</param>
-        /// <param name="result">The new projection <see cref="Matrix"/> for perspective view with FOV as an output parameter.</param>
-        public static void CreatePerspectiveFieldOfView(float fieldOfView, float aspectRatio, float nearPlaneDistance, float farPlaneDistance, out Matrix result)
+        /// <param name="near">Distance to the near plane.</param>
+        /// <param name="far">Distance to the far plane.</param>
+        /// <param name="result">The result as an output parameter.</param>
+        public static void CreatePerspectiveFieldOfView(float fieldOfView, float aspectRatio, float near, float far, out Matrix result)
         {
-            if ((fieldOfView <= 0f) || (fieldOfView >= 3.141593f))
-            {
-                throw new ArgumentException("fieldOfView <= 0 or >= PI");
-            }
-            if (nearPlaneDistance <= 0f)
-            {
-                throw new ArgumentException("nearPlaneDistance <= 0");
-            }
-            if (farPlaneDistance <= 0f)
-            {
-                throw new ArgumentException("farPlaneDistance <= 0");
-            }
-            if (nearPlaneDistance >= farPlaneDistance)
-            {
-                throw new ArgumentException("nearPlaneDistance >= farPlaneDistance");
-            }
-            float num = 1f / ((float)Math.Tan(fieldOfView * 0.5f));
-            float num9 = num / aspectRatio;
-            result.m00 = num9;
-            result.m01 = result.m02 = result.m03 = 0;
-            result.m11 = num;
-            result.m10 = result.m12 = result.m13 = 0;
-            result.m20 = result.m21 = 0f;
-            result.m22 = farPlaneDistance / (nearPlaneDistance - farPlaneDistance);
+            float yScale = 1f / (float)Math.Tan(0.5f * fieldOfView);
+            float xScale = yScale / aspectRatio;
+
+            result.m00 = xScale;
+            result.m01 = 0f;
+            result.m02 = 0f;
+            result.m03 = 0f;
+
+            result.m10 = 0f;
+            result.m11 = yScale;
+            result.m12 = 0f;
+            result.m13 = 0;
+
+            result.m20 = 0f;
+            result.m21 = 0f;
+            result.m22 = -(far + near) / (far - near);
             result.m23 = -1;
-            result.m30 = result.m31 = result.m33 = 0;
-            result.m32 = (nearPlaneDistance * farPlaneDistance) / (nearPlaneDistance - farPlaneDistance);
+
+            result.m30 = 0f;
+            result.m31 = 0f;
+            result.m32 = (-2f * far * near) / (far - near);
+            result.m33 = 0f;
         }
 
         /// <summary>
-        /// Creates a new projection <see cref="Matrix"/> for customized perspective view.
+        /// Creates a new projection matrix for a customized perspective view.
         /// </summary>
-        /// <param name="left">Lower x-value at the near plane.</param>
-        /// <param name="right">Upper x-value at the near plane.</param>
-        /// <param name="bottom">Lower y-coordinate at the near plane.</param>
-        /// <param name="top">Upper y-value at the near plane.</param>
-        /// <param name="nearPlaneDistance">Distance to the near plane.</param>
-        /// <param name="farPlaneDistance">Distance to the far plane.</param>
-        /// <returns>The new <see cref="Matrix"/> for customized perspective view.</returns>
-        public static Matrix CreatePerspectiveOffCenter(float left, float right, float bottom, float top, float nearPlaneDistance, float farPlaneDistance)
+        /// <param name="left">Lower x coordinate at the near plane.</param>
+        /// <param name="right">Upper x coordinate at the near plane.</param>
+        /// <param name="bottom">Lower y coordinate at the near plane.</param>
+        /// <param name="top">Upper y coordinate at the near plane.</param>
+        /// <param name="near">Distance to the near plane.</param>
+        /// <param name="far">Distance to the far plane.</param>
+        public static Matrix CreatePerspectiveOffCenter(float left, float right, float bottom, float top, float near, float far)
         {
-            CreatePerspectiveOffCenter(left, right, bottom, top, nearPlaneDistance, farPlaneDistance, out Matrix result);
-            return result;
-        }
-        /// <summary>
-        /// Creates a new projection <see cref="Matrix"/> for customized perspective view.
-        /// </summary>
-        /// <param name="viewingVolume">The viewing volume.</param>
-        /// <param name="nearPlaneDistance">Distance to the near plane.</param>
-        /// <param name="farPlaneDistance">Distance to the far plane.</param>
-        /// <returns>The new <see cref="Matrix"/> for customized perspective view.</returns>
-        public static Matrix CreatePerspectiveOffCenter(Rectangle viewingVolume, float nearPlaneDistance, float farPlaneDistance)
-        {
-            CreatePerspectiveOffCenter(viewingVolume.Left, viewingVolume.Right, viewingVolume.Bottom, viewingVolume.Top, nearPlaneDistance, farPlaneDistance, out Matrix result);
+            CreatePerspectiveOffCenter(left, right, bottom, top, near, far, out Matrix result);
             return result;
         }
 
         /// <summary>
-        /// Creates a new projection <see cref="Matrix"/> for customized perspective view.
+        /// Creates a new projection matrix for a customized perspective view.
         /// </summary>
-        /// <param name="left">Lower x-value at the near plane.</param>
-        /// <param name="right">Upper x-value at the near plane.</param>
-        /// <param name="bottom">Lower y-coordinate at the near plane.</param>
-        /// <param name="top">Upper y-value at the near plane.</param>
-        /// <param name="nearPlaneDistance">Distance to the near plane.</param>
-        /// <param name="farPlaneDistance">Distance to the far plane.</param>
-        /// <param name="result">The new <see cref="Matrix"/> for customized perspective view as an output parameter.</param>
-        public static void CreatePerspectiveOffCenter(float left, float right, float bottom, float top, float nearPlaneDistance, float farPlaneDistance, out Matrix result)
+        /// <param name="volume">The viewing volume.</param>
+        /// <param name="near">Distance to the near plane.</param>
+        /// <param name="far">Distance to the far plane.</param>
+        public static Matrix CreatePerspectiveOffCenter(Rect volume, float near, float far)
         {
-            if (nearPlaneDistance <= 0f)
-            {
-                throw new ArgumentException("nearPlaneDistance <= 0");
-            }
-            if (farPlaneDistance <= 0f)
-            {
-                throw new ArgumentException("farPlaneDistance <= 0");
-            }
-            if (nearPlaneDistance >= farPlaneDistance)
-            {
-                throw new ArgumentException("nearPlaneDistance >= farPlaneDistance");
-            }
-            result.m00 = (2f * nearPlaneDistance) / (right - left);
-            result.m01 = result.m02 = result.m03 = 0;
-            result.m11 = (2f * nearPlaneDistance) / (top - bottom);
-            result.m10 = result.m12 = result.m13 = 0;
-            result.m20 = (left + right) / (right - left);
+            CreatePerspectiveOffCenter(volume.xMin, volume.xMax, volume.yMin, volume.yMax, near, far, out Matrix result);
+            return result;
+        }
+
+        /// <summary>
+        /// Creates a new projection matrix for a customized perspective view.
+        /// </summary>
+        /// <param name="left">Lower x coordinate at the near plane.</param>
+        /// <param name="right">Upper x coordinate at the near plane.</param>
+        /// <param name="bottom">Lower y coordinate at the near plane.</param>
+        /// <param name="top">Upper y coordinate at the near plane.</param>
+        /// <param name="near">Distance to the near plane.</param>
+        /// <param name="far">Distance to the far plane.</param>
+        public static void CreatePerspectiveOffCenter(float left, float right, float bottom, float top, float near, float far, out Matrix result)
+        {
+            result.m00 = (2f * near) / (right - left);
+            result.m01 = 0f;
+            result.m02 = 0f;
+            result.m03 = 0f;
+
+            result.m10 = 0f;
+            result.m11 = (2f * near) / (top - bottom);
+            result.m12 = 0f;
+            result.m13 = 0;
+
+            result.m20 = (right + left) / (right - left);
             result.m21 = (top + bottom) / (top - bottom);
-            result.m22 = farPlaneDistance / (nearPlaneDistance - farPlaneDistance);
+            result.m22 = -(far + near) / (far - near);
             result.m23 = -1;
-            result.m32 = (nearPlaneDistance * farPlaneDistance) / (nearPlaneDistance - farPlaneDistance);
-            result.m30 = result.m31 = result.m33 = 0;
+
+            result.m30 = 0f;
+            result.m31 = 0f;
+            result.m32 = (-2f * far * near) / (far - near);
+            result.m33 = 0f;
         }
 
         /// <summary>
-        /// Creates a new rotation <see cref="Matrix"/> around X axis.
+        /// Creates a new scaling matrix.
         /// </summary>
-        /// <param name="radians">Angle in radians.</param>
-        /// <returns>The rotation <see cref="Matrix"/> around X axis.</returns>
-        public static Matrix CreateRotationX(float radians)
-        {
-            CreateRotationX(radians, out Matrix result);
-            return result;
-        }
-
-        /// <summary>
-        /// Creates a new rotation <see cref="Matrix"/> around X axis.
-        /// </summary>
-        /// <param name="radians">Angle in radians.</param>
-        /// <param name="result">The rotation <see cref="Matrix"/> around X axis as an output parameter.</param>
-        public static void CreateRotationX(float radians, out Matrix result)
-        {
-            result = Matrix.Identity;
-
-            var val1 = (float)Math.Cos(radians);
-            var val2 = (float)Math.Sin(radians);
-
-            result.m11 = val1;
-            result.m12 = val2;
-            result.m21 = -val2;
-            result.m22 = val1;
-        }
-
-        /// <summary>
-        /// Creates a new rotation <see cref="Matrix"/> around Y axis.
-        /// </summary>
-        /// <param name="radians">Angle in radians.</param>
-        /// <returns>The rotation <see cref="Matrix"/> around Y axis.</returns>
-        public static Matrix CreateRotationY(float radians)
-        {
-            CreateRotationY(radians, out Matrix result);
-            return result;
-        }
-
-        /// <summary>
-        /// Creates a new rotation <see cref="Matrix"/> around Y axis.
-        /// </summary>
-        /// <param name="radians">Angle in radians.</param>
-        /// <param name="result">The rotation <see cref="Matrix"/> around Y axis as an output parameter.</param>
-        public static void CreateRotationY(float radians, out Matrix result)
-        {
-            result = Matrix.Identity;
-
-            var val1 = (float)Math.Cos(radians);
-            var val2 = (float)Math.Sin(radians);
-
-            result.m00 = val1;
-            result.m02 = -val2;
-            result.m20 = val2;
-            result.m22 = val1;
-        }
-
-        /// <summary>
-        /// Creates a new rotation <see cref="Matrix"/> around Z axis.
-        /// </summary>
-        /// <param name="radians">Angle in radians.</param>
-        /// <returns>The rotation <see cref="Matrix"/> around Z axis.</returns>
-        public static Matrix CreateRotationZ(float radians)
-        {
-            CreateRotationZ(radians, out Matrix result);
-            return result;
-        }
-
-        /// <summary>
-        /// Creates a new rotation <see cref="Matrix"/> around Z axis.
-        /// </summary>
-        /// <param name="radians">Angle in radians.</param>
-        /// <param name="result">The rotation <see cref="Matrix"/> around Z axis as an output parameter.</param>
-        public static void CreateRotationZ(float radians, out Matrix result)
-        {
-            result = Matrix.Identity;
-
-            var val1 = (float)Math.Cos(radians);
-            var val2 = (float)Math.Sin(radians);
-
-            result.m00 = val1;
-            result.m01 = val2;
-            result.m10 = -val2;
-            result.m11 = val1;
-        }
-
-        /// <summary>
-        /// Creates a new scaling <see cref="Matrix"/>.
-        /// </summary>
-        /// <param name="scale">Scale value for all three axises.</param>
-        /// <returns>The scaling <see cref="Matrix"/>.</returns>
+        /// <param name="scale">The scale value.</param>
         public static Matrix CreateScale(float scale)
         {
-            CreateScale(scale, scale, scale, out Matrix result);
+            CreateScale(scale, out Matrix result);
             return result;
         }
 
         /// <summary>
-        /// Creates a new scaling <see cref="Matrix"/>.
+        /// Creates a new scaling matrix.
         /// </summary>
-        /// <param name="scale">Scale value for all three axises.</param>
-        /// <param name="result">The scaling <see cref="Matrix"/> as an output parameter.</param>
+        /// <param name="scale">The scale value.</param>
+        /// <param name="result">The result as an output parameter.</param>
         public static void CreateScale(float scale, out Matrix result)
         {
             CreateScale(scale, scale, scale, out result);
         }
 
         /// <summary>
-        /// Creates a new scaling <see cref="Matrix"/>.
+        /// Creates a new scaling matrix.
         /// </summary>
-        /// <param name="xScale">Scale value for X axis.</param>
-        /// <param name="yScale">Scale value for Y axis.</param>
-        /// <param name="zScale">Scale value for Z axis.</param>
-        /// <returns>The scaling <see cref="Matrix"/>.</returns>
-        public static Matrix CreateScale(float xScale, float yScale, float zScale)
+        /// <param name="x">Scale value for X axis.</param>
+        /// <param name="y">Scale value for Y axis.</param>
+        /// <param name="z">Scale value for Z axis.</param>
+        public static Matrix CreateScale(float x, float y, float z)
         {
-            CreateScale(xScale, yScale, zScale, out Matrix result);
+            CreateScale(x, y, z, out Matrix result);
             return result;
         }
 
         /// <summary>
-        /// Creates a new scaling <see cref="Matrix"/>.
+        /// Creates a new scaling matrix.
         /// </summary>
-        /// <param name="xScale">Scale value for X axis.</param>
-        /// <param name="yScale">Scale value for Y axis.</param>
-        /// <param name="zScale">Scale value for Z axis.</param>
-        /// <param name="result">The scaling <see cref="Matrix"/> as an output parameter.</param>
-        public static void CreateScale(float xScale, float yScale, float zScale, out Matrix result)
+        /// <param name="x">Scale value for X axis.</param>
+        /// <param name="y">Scale value for Y axis.</param>
+        /// <param name="z">Scale value for Z axis.</param>
+        /// <param name="result">The result as an output parameter.</param>
+        public static void CreateScale(float x, float y, float z, out Matrix result)
         {
-            result.m00 = xScale;
-            result.m01 = 0;
-            result.m02 = 0;
-            result.m03 = 0;
-            result.m10 = 0;
-            result.m11 = yScale;
-            result.m12 = 0;
-            result.m13 = 0;
-            result.m20 = 0;
-            result.m21 = 0;
-            result.m22 = zScale;
-            result.m23 = 0;
-            result.m30 = 0;
-            result.m31 = 0;
-            result.m32 = 0;
-            result.m33 = 1;
+            result.m00 = x;
+            result.m01 = 0f;
+            result.m02 = 0f;
+            result.m03 = 0f;
+
+            result.m10 = 0f;
+            result.m11 = y;
+            result.m12 = 0f;
+            result.m13 = 0f;
+
+            result.m20 = 0f;
+            result.m21 = 0f;
+            result.m22 = z;
+            result.m23 = 0f;
+
+            result.m30 = 0f;
+            result.m31 = 0f;
+            result.m32 = 0f;
+            result.m33 = 1f;
         }
 
         /// <summary>
-        /// Creates a new scaling <see cref="Matrix"/>.
+        /// Creates a new scaling matrix.
         /// </summary>
-        /// <param name="scales"><see cref="Vector3"/> representing x,y and z scale values.</param>
-        /// <returns>The scaling <see cref="Matrix"/>.</returns>
-        public static Matrix CreateScale(Vector3 scales)
+        /// <param name="scale">The scale for each axis.</param>
+        public static Matrix CreateScale(Vector3 scale)
         {
-            CreateScale(ref scales, out Matrix result);
+            CreateScale(ref scale, out Matrix result);
             return result;
         }
 
         /// <summary>
-        /// Creates a new scaling <see cref="Matrix"/>.
+        /// Creates a new scaling matrix.
         /// </summary>
-        /// <param name="scales"><see cref="Vector3"/> representing x,y and z scale values.</param>
-        /// <param name="result">The scaling <see cref="Matrix"/> as an output parameter.</param>
-        public static void CreateScale(ref Vector3 scales, out Matrix result)
+        /// <param name="scale">The scale for each axis.</param>
+        /// <param name="result">The result as an output parameter.</param>
+        public static void CreateScale(ref Vector3 scale, out Matrix result)
         {
-            result.m00 = scales.x;
-            result.m01 = 0;
-            result.m02 = 0;
-            result.m03 = 0;
-            result.m10 = 0;
-            result.m11 = scales.y;
-            result.m12 = 0;
-            result.m13 = 0;
-            result.m20 = 0;
-            result.m21 = 0;
-            result.m22 = scales.z;
-            result.m23 = 0;
-            result.m30 = 0;
-            result.m31 = 0;
-            result.m32 = 0;
-            result.m33 = 1;
+            result.m00 = scale.x;
+            result.m01 = 0f;
+            result.m02 = 0f;
+            result.m03 = 0f;
+
+            result.m10 = 0f;
+            result.m11 = scale.y;
+            result.m12 = 0f;
+            result.m13 = 0f;
+
+            result.m20 = 0f;
+            result.m21 = 0f;
+            result.m22 = scale.z;
+            result.m23 = 0f;
+
+            result.m30 = 0f;
+            result.m31 = 0f;
+            result.m32 = 0f;
+            result.m33 = 1f;
         }
-
-
+        
         /// <summary>
-        /// Creates a new <see cref="Matrix"/> that flattens geometry into a specified <see cref="Plane"/> as if casting a shadow from a specified light source. 
+        /// Creates a new translation matrix.
         /// </summary>
-        /// <param name="lightDirection">A vector specifying the direction from which the light that will cast the shadow is coming.</param>
-        /// <param name="plane">The plane onto which the new matrix should flatten geometry so as to cast a shadow.</param>
-        /// <returns>A <see cref="Matrix"/> that can be used to flatten geometry onto the specified plane from the specified direction. </returns>
-        public static Matrix CreateShadow(Vector3 lightDirection, Plane plane)
+        /// <param name="x">X coordinate of translation.</param>
+        /// <param name="y">Y coordinate of translation.</param>
+        /// <param name="z">Z coordinate of translation.</param>
+        public static Matrix CreateTranslation(float x, float y, float z)
         {
-            CreateShadow(ref lightDirection, ref plane, out Matrix result);
-            return result;
-        }
-
-
-        /// <summary>
-        /// Creates a new <see cref="Matrix"/> that flattens geometry into a specified <see cref="Plane"/> as if casting a shadow from a specified light source. 
-        /// </summary>
-        /// <param name="lightDirection">A vector specifying the direction from which the light that will cast the shadow is coming.</param>
-        /// <param name="plane">The plane onto which the new matrix should flatten geometry so as to cast a shadow.</param>
-        /// <param name="result">A <see cref="Matrix"/> that can be used to flatten geometry onto the specified plane from the specified direction as an output parameter.</param>
-        public static void CreateShadow(ref Vector3 lightDirection, ref Plane plane, out Matrix result)
-        {
-            float dot = (plane.Normal.x * lightDirection.x) + (plane.Normal.y * lightDirection.y) + (plane.Normal.z * lightDirection.z);
-            float x = -plane.Normal.x;
-            float y = -plane.Normal.y;
-            float z = -plane.Normal.z;
-            float d = -plane.D;
-
-            result.m00 = (x * lightDirection.x) + dot;
-            result.m01 = x * lightDirection.y;
-            result.m02 = x * lightDirection.z;
-            result.m03 = 0;
-            result.m10 = y * lightDirection.x;
-            result.m11 = (y * lightDirection.y) + dot;
-            result.m12 = y * lightDirection.z;
-            result.m13 = 0;
-            result.m20 = z * lightDirection.x;
-            result.m21 = z * lightDirection.y;
-            result.m22 = (z * lightDirection.z) + dot;
-            result.m23 = 0;
-            result.m30 = d * lightDirection.x;
-            result.m31 = d * lightDirection.y;
-            result.m32 = d * lightDirection.z;
-            result.m33 = dot;
-        }
-
-        /// <summary>
-        /// Creates a new translation <see cref="Matrix"/>.
-        /// </summary>
-        /// <param name="xPosition">X coordinate of translation.</param>
-        /// <param name="yPosition">Y coordinate of translation.</param>
-        /// <param name="zPosition">Z coordinate of translation.</param>
-        /// <returns>The translation <see cref="Matrix"/>.</returns>
-        public static Matrix CreateTranslation(float xPosition, float yPosition, float zPosition)
-        {
-            CreateTranslation(xPosition, yPosition, zPosition, out Matrix result);
+            CreateTranslation(x, y, z, out Matrix result);
             return result;
         }
 
         /// <summary>
-        /// Creates a new translation <see cref="Matrix"/>.
+        /// Creates a new translation matrix.
         /// </summary>
-        /// <param name="position">X,Y and Z coordinates of translation.</param>
-        /// <param name="result">The translation <see cref="Matrix"/> as an output parameter.</param>
-        public static void CreateTranslation(ref Vector3 position, out Matrix result)
+        /// <param name="x">X coordinate of translation.</param>
+        /// <param name="y">Y coordinate of translation.</param>
+        /// <param name="x">Z coordinate of translation.</param>
+        /// <param name="result">The translation as an output parameter.</param>
+        public static void CreateTranslation(float x, float y, float z, out Matrix result)
         {
-            result.m00 = 1;
-            result.m01 = 0;
-            result.m02 = 0;
-            result.m03 = 0;
-            result.m10 = 0;
-            result.m11 = 1;
-            result.m12 = 0;
-            result.m13 = 0;
-            result.m20 = 0;
-            result.m21 = 0;
-            result.m22 = 1;
-            result.m23 = 0;
-            result.m30 = position.x;
-            result.m31 = position.y;
-            result.m32 = position.z;
-            result.m33 = 1;
+            result.m00 = 1f;
+            result.m01 = 0f;
+            result.m02 = 0f;
+            result.m03 = 0f;
+
+            result.m10 = 0f;
+            result.m11 = 1f;
+            result.m12 = 0f;
+            result.m13 = 0f;
+
+            result.m20 = 0f;
+            result.m21 = 0f;
+            result.m22 = 1f;
+            result.m23 = 0f;
+
+            result.m30 = x;
+            result.m31 = y;
+            result.m32 = z;
+            result.m33 = 1f;
         }
 
         /// <summary>
-        /// Creates a new translation <see cref="Matrix"/>.
+        /// Creates a new translation matrix.
         /// </summary>
-        /// <param name="position">X,Y and Z coordinates of translation.</param>
+        /// <param name="position">The translation.</param>
         /// <returns>The translation <see cref="Matrix"/>.</returns>
         public static Matrix CreateTranslation(Vector3 position)
         {
@@ -1990,152 +1668,110 @@ namespace Engine
         }
 
         /// <summary>
-        /// Creates a new translation <see cref="Matrix"/>.
+        /// Creates a new translation matrix.
         /// </summary>
-        /// <param name="xPosition">X coordinate of translation.</param>
-        /// <param name="yPosition">Y coordinate of translation.</param>
-        /// <param name="zPosition">Z coordinate of translation.</param>
-        /// <param name="result">The translation <see cref="Matrix"/> as an output parameter.</param>
-        public static void CreateTranslation(float xPosition, float yPosition, float zPosition, out Matrix result)
+        /// <param name="position">The translation.</param>
+        /// <param name="result">The result as an output parameter.</param>
+        public static void CreateTranslation(ref Vector3 position, out Matrix result)
         {
-            result.m00 = 1;
-            result.m01 = 0;
-            result.m02 = 0;
-            result.m03 = 0;
-            result.m10 = 0;
-            result.m11 = 1;
-            result.m12 = 0;
-            result.m13 = 0;
-            result.m20 = 0;
-            result.m21 = 0;
-            result.m22 = 1;
-            result.m23 = 0;
-            result.m30 = xPosition;
-            result.m31 = yPosition;
-            result.m32 = zPosition;
-            result.m33 = 1;
-        }
+            result.m00 = 1f;
+            result.m01 = 0f;
+            result.m02 = 0f;
+            result.m03 = 0f;
 
-        /// <summary>
-        /// Creates a new reflection <see cref="Matrix"/>.
-        /// </summary>
-        /// <param name="value">The plane that used for reflection calculation.</param>
-        /// <returns>The reflection <see cref="Matrix"/>.</returns>
-        public static Matrix CreateReflection(Plane value)
-        {
-            CreateReflection(ref value, out Matrix result);
-            return result;
-        }
+            result.m10 = 0f;
+            result.m11 = 1f;
+            result.m12 = 0f;
+            result.m13 = 0f;
 
-        /// <summary>
-        /// Creates a new reflection <see cref="Matrix"/>.
-        /// </summary>
-        /// <param name="value">The plane that used for reflection calculation.</param>
-        /// <param name="result">The reflection <see cref="Matrix"/> as an output parameter.</param>
-        public static void CreateReflection(ref Plane value, out Matrix result)
-        {
-            Plane.Normalize(ref value, out Plane plane);
-            float x = plane.Normal.x;
-            float y = plane.Normal.y;
-            float z = plane.Normal.z;
-            float num3 = -2f * x;
-            float num2 = -2f * y;
-            float num = -2f * z;
-            result.m00 = (num3 * x) + 1f;
-            result.m01 = num2 * x;
-            result.m02 = num * x;
-            result.m03 = 0;
-            result.m10 = num3 * y;
-            result.m11 = (num2 * y) + 1;
-            result.m12 = num * y;
-            result.m13 = 0;
-            result.m20 = num3 * z;
-            result.m21 = num2 * z;
-            result.m22 = (num * z) + 1;
-            result.m23 = 0;
-            result.m30 = num3 * plane.D;
-            result.m31 = num2 * plane.D;
-            result.m32 = num * plane.D;
-            result.m33 = 1;
-        }
+            result.m20 = 0f;
+            result.m21 = 0f;
+            result.m22 = 1f;
+            result.m23 = 0f;
 
-        /// <summary>
-        /// Creates a new world <see cref="Matrix"/>.
-        /// </summary>
-        /// <param name="position">The position vector.</param>
-        /// <param name="forward">The forward direction vector.</param>
-        /// <param name="up">The upward direction vector. Usually <see cref="Vector3.Up"/>.</param>
-        /// <returns>The world <see cref="Matrix"/>.</returns>
-        public static Matrix CreateWorld(Vector3 position, Vector3 forward, Vector3 up)
-        {
-            CreateWorld(ref position, ref forward, ref up, out Matrix ret);
-            return ret;
-        }
-
-        /// <summary>
-        /// Creates a new world <see cref="Matrix"/>.
-        /// </summary>
-        /// <param name="position">The position vector.</param>
-        /// <param name="forward">The forward direction vector.</param>
-        /// <param name="up">The upward direction vector. Usually <see cref="Vector3.Up"/>.</param>
-        /// <param name="result">The world <see cref="Matrix"/> as an output parameter.</param>
-        public static void CreateWorld(ref Vector3 position, ref Vector3 forward, ref Vector3 up, out Matrix result)
-        {
-            Vector3.Normalize(ref forward, out Vector3 z);
-            Vector3.Cross(ref forward, ref up, out Vector3 x);
-            Vector3.Cross(ref x, ref forward, out Vector3 y);
-            x.Normalize();
-            y.Normalize();
-
-            result = new Matrix();
-            result.Right = x;
-            result.Up = y;
-            result.Forward = z;
-            result.Translation = position;
+            result.m30 = position.x;
+            result.m31 = position.y;
+            result.m32 = position.z;
             result.m33 = 1f;
         }
-
+        
         /// <summary>
-        /// Decomposes this matrix to translation, rotation and scale elements. Returns <c>true</c> if matrix can be decomposed; <c>false</c> otherwise.
+        /// Decomposes this matrix to translation, rotation and scale elements.
         /// </summary>
+        /// <param name="translation">Translation vector as an output parameter.</param>
         /// <param name="scale">Scale vector as an output parameter.</param>
         /// <param name="rotation">Rotation quaternion as an output parameter.</param>
-        /// <param name="translation">Translation vector as an output parameter.</param>
-        /// <returns><c>true</c> if matrix can be decomposed; <c>false</c> otherwise.</returns>
-        public bool Decompose(out Vector3 scale, out Quaternion rotation, out Vector3 translation)
+        /// <returns><c>true</c> if matrix can be decomposed, <c>false</c> otherwise.</returns>
+        public bool Decompose(out Vector3 translation, out Quaternion rotation, out Vector3 scale)
         {
-            translation.x = this.m30;
-            translation.y = this.m31;
-            translation.z = this.m32;
+            translation.x = m30;
+            translation.y = m31;
+            translation.z = m32;
+            
+            scale.x = Mathf.Sqrt(m00 * m00 + m01 * m01 + m02 * m02);
+            scale.y = Mathf.Sqrt(m10 * m10 + m11 * m11 + m12 * m12);
+            scale.z = Mathf.Sqrt(m20 * m20 + m21 * m21 + m22 * m22);
 
-            float xs = (Math.Sign(m00 * m01 * m02 * m03) < 0) ? -1 : 1;
-            float ys = (Math.Sign(m10 * m11 * m12 * m13) < 0) ? -1 : 1;
-            float zs = (Math.Sign(m20 * m21 * m22 * m23) < 0) ? -1 : 1;
-
-            scale.x = xs * (float)Math.Sqrt(this.m00 * this.m00 + this.m01 * this.m01 + this.m02 * this.m02);
-            scale.y = ys * (float)Math.Sqrt(this.m10 * this.m10 + this.m11 * this.m11 + this.m12 * this.m12);
-            scale.z = zs * (float)Math.Sqrt(this.m20 * this.m20 + this.m21 * this.m21 + this.m22 * this.m22);
-
-            if (scale.x == 0.0 || scale.y == 0.0 || scale.z == 0.0)
+            if (scale.x == 0f || scale.y == 0f || scale.z == 0f)
             {
                 rotation = Quaternion.Identity;
                 return false;
             }
+            
+            Vector3 row0 = new Vector3(m00, m01, m02) / scale.x;
+            Vector3 row1 = new Vector3(m10, m11, m12) / scale.y;
+            Vector3 row2 = new Vector3(m20, m21, m22) / scale.z;
 
-            Matrix m1 = new Matrix(this.m00 / scale.x, m01 / scale.x, m02 / scale.x, 0,
-                                   this.m10 / scale.y, m11 / scale.y, m12 / scale.y, 0,
-                                   this.m20 / scale.z, m21 / scale.z, m22 / scale.z, 0,
-                                   0, 0, 0, 1);
+            float trace = 1f + row0.x + row1.y + row2.z;
 
-            rotation = Quaternion.CreateFromRotationMatrix(m1);
+            if (trace >= 0)
+            {
+                float s = 2f * (float)Math.Sqrt(trace);
+                float invS = 1f / s;
+
+                rotation.w = 0.25f * s;
+                rotation.x = invS * (row2.y - row1.z);
+                rotation.y = invS * (row0.z - row2.x);
+                rotation.z = invS * (row1.x - row0.y);
+            }
+            else if (row0.x > row1.y && row0.x > row2.z)
+            {
+                float s = 2f * (float)Math.Sqrt(1f + row0.x - row1.y - row2.z);
+                float invS = 1f / s;
+
+                rotation.x = 0.25f * s;
+                rotation.y = invS * (row1.x + row0.y);
+                rotation.z = invS * (row2.x + row0.z);
+                rotation.w = invS * (row1.z - row2.y);
+            }
+            else if (row1.y > row2.z)
+            {
+                float s = 2f * (float)Math.Sqrt(1f - row0.x + row1.y - row2.z);
+                float invS = 1f / s;
+
+                rotation.y = 0.25f * s;
+                rotation.x = invS * (row1.x + row0.y);
+                rotation.z = invS * (row2.y + row1.z);
+                rotation.w = invS * (row2.x - row0.z);
+            }
+            else
+            {
+                float s = 2f * (float)Math.Sqrt(1f - row0.x - row1.y + row2.z);
+                float invS = 1f / s;
+
+                rotation.z = 0.25f * s;
+                rotation.x = invS * (row2.x + row0.z);
+                rotation.y = invS * (row2.y + row1.z);
+                rotation.w = invS * (row0.y - row1.x);
+            }
+            
             return true;
         }
-        */
 
         /// <summary>
-        /// Compares whether current instance is equal to a specified <see cref="Matrix"/> without any tolerance.
+        /// Compares whether this instance is equal to another.
         /// </summary>
-        /// <param name="other">The <see cref="Matrix"/> to compare with.</param>
+        /// <param name="other">The instance to compare with.</param>
         /// <returns><c>true</c> if the instances are equal, <c>false</c> otherwise.</returns>
         public bool Equals(Matrix other)
         {
@@ -2147,23 +1783,18 @@ namespace Engine
         }
 
         /// <summary>
-        /// Compares whether current instance is equal to specified <see cref="Object"/> without any tolerance.
+        /// Compares whether this instance is equal to specified <see cref="Object"/>.
         /// </summary>
         /// <param name="obj">The <see cref="Object"/> to compare.</param>
         /// <returns><c>true</c> if the instances are equal, <c>false</c> otherwise.</returns>
         public override bool Equals(object obj)
         {
-            if (obj is Matrix)
-            {
-                return Equals((Matrix)obj);
-            }
-            return false;
+            return (obj is Matrix) && Equals((Matrix)obj);
         }
 
         /// <summary>
-        /// Gets the hash code of this <see cref="Matrix"/>.
+        /// Gets the hash code of this instance.
         /// </summary>
-        /// <returns>Hash code of this <see cref="Matrix"/>.</returns>
         public override int GetHashCode()
         {
             unchecked
@@ -2177,12 +1808,11 @@ namespace Engine
         }
 
         /// <summary>
-        /// Returns a <see cref="String"/> representation of this <see cref="Matrix"/>.
+        /// Returns a <see cref="String"/> representation of this instance.
         /// </summary>
-        /// <returns>The string representation of the matrix.</returns>
         public override string ToString()
         {
-            return $"{Row0}\n{Row1}\n{Row2}\n{Row3}";
+            return $"\n{Row0}\n{Row1}\n{Row2}\n{Row3}";
         }
 
         public static Matrix operator +(Matrix left, Matrix right) => Add(left, right);

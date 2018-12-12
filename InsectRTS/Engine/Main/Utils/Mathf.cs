@@ -172,17 +172,17 @@ namespace Engine
                 return 0;
             }
 
-            var min = values[0];
+            var max = values[0];
             for (int i = 1; i < count; i++)
             {
                 var value = values[i];
-                if (value > min)
+                if (value > max)
                 {
-                    min = value;
+                    max = value;
                 }
             }
 
-            return min;
+            return max;
         }
 
         /// <summary>
@@ -196,17 +196,17 @@ namespace Engine
                 return 0;
             }
 
-            var min = values[0];
+            var max = values[0];
             for (int i = 1; i < count; i++)
             {
                 var value = values[i];
-                if (value > min)
+                if (value > max)
                 {
-                    min = value;
+                    max = value;
                 }
             }
 
-            return min;
+            return max;
         }
 
 
@@ -252,7 +252,7 @@ namespace Engine
         /// Clamps a number between 0 and 1.
         /// </summary>
         /// <param name="n">The number to clamp.</param>
-        public static double Clamp01(double n) => Max(Min(n, 1f), 0f);
+        public static double Clamp01(double n) => Max(Min(n, 1), 0);
 
 
         /// <summary>
@@ -279,7 +279,7 @@ namespace Engine
         /// <summary>
         /// Gets the sign of a number.
         /// </summary>
-        public static float Sign(float n) => n >= 0f ? 1f : -1f;
+        public static float Sign(float n) => n < 0f ? -1f : 1f;
 
 
         /// <summary>
@@ -419,7 +419,7 @@ namespace Engine
 
         /// <summary>
         /// Linearly interpolates from a to b by factor t.
-        /// See <see cref="MathHelper.LerpPrecise"/> for a less efficient version with more precision around edge cases.
+        /// See <see cref="Math.LerpPrecise"/> for a less efficient version with more precision around edge cases.
         /// </summary>
         /// <param name="a">From value.</param>
         /// <param name="b">To value.</param>
@@ -431,7 +431,7 @@ namespace Engine
 
         /// <summary>
         /// Linearly interpolates from a to b by factor t.
-        /// This method is a less efficient, more precise version of <see cref="MathHelper.Lerp"/>.
+        /// This method is a less efficient, more precise version of <see cref="Math.Lerp"/>.
         /// </summary>
         /// <param name="a">From value.</param>
         /// <param name="b">To value.</param>
@@ -443,7 +443,7 @@ namespace Engine
 
         /// <summary>
         /// Linearly interpolates from a to b by factor t, where t is clamped to 0 and 1.
-        /// See <see cref="MathHelper.LerpClampedPrecise"/> for a less efficient version with more precision around edge cases.
+        /// See <see cref="Math.LerpClampedPrecise"/> for a less efficient version with more precision around edge cases.
         /// </summary>
         /// <param name="a">From value.</param>
         /// <param name="b">To value.</param>
@@ -452,7 +452,7 @@ namespace Engine
 
         /// <summary>
         /// Linearly interpolates from a to b by factor t, where t is clamped to 0 and 1.
-        /// This method is a less efficient, more precise version of <see cref="MathHelper.LerpClamped"/>.
+        /// This method is a less efficient, more precise version of <see cref="Math.LerpClamped"/>.
         /// </summary>
         /// <param name="a">From value.</param>
         /// <param name="b">To value.</param>

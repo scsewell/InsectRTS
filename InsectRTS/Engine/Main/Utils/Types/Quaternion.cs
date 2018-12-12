@@ -31,7 +31,7 @@ namespace Engine
         public float z;
 
         /// <summary>
-        /// The rotation component.
+        /// The w component.
         /// </summary>
         public float w;
 
@@ -176,9 +176,10 @@ namespace Engine
             float len = (float)Math.Sqrt(1f - (q.w * q.w));
             if (len > float.Epsilon)
             {
-                axis.x = q.x / len;
-                axis.y = q.y / len;
-                axis.z = q.z / len;
+                float scale = 1f / len;
+                axis.x = q.x * scale;
+                axis.y = q.y * scale;
+                axis.z = q.z * scale;
             }
             else
             {
@@ -265,8 +266,8 @@ namespace Engine
         /// <param name="right">The right instance.</param>
         public static Quaternion Multiply(Quaternion left, Quaternion right)
         {
-            Multiply(ref left, ref right, out left);
-            return left;
+            Multiply(ref left, ref right, out Quaternion result);
+            return result;
         }
 
         /// <summary>
@@ -276,20 +277,10 @@ namespace Engine
         /// <param name="right">The right instance.</param>
         public static void Multiply(ref Quaternion left, ref Quaternion right, out Quaternion result)
         {
-            float x1 = left.x;
-            float y1 = left.y;
-            float z1 = left.z;
-            float w1 = left.w;
-
-            float x2 = right.x;
-            float y2 = right.y;
-            float z2 = right.z;
-            float w2 = right.w;
-
-            result.x = (x2 * w1) + (x1 * w2) + (y2 * z1) - (z2 * y1);
-            result.y = (y2 * w1) + (y1 * w2) + (z2 * x1) - (x2 * z1);
-            result.z = (z2 * w1) + (z1 * w2) + (x2 * y1) - (y2 * x1);
-            result.w = (w2 * w1) - (x2 * x1) - (y2 * y1) - (z2 * z1);
+            result.w = (left.w * right.w) - (left.x * right.x) - (left.y * right.y) - (left.z * right.z);
+            result.x = (left.x * right.w) + (left.w * right.x) - (left.z * right.y) + (left.y * right.z);
+            result.y = (left.y * right.w) + (left.z * right.x) + (left.w * right.y) - (left.x * right.z);
+            result.z = (left.z * right.w) - (left.y * right.x) + (left.x * right.y) + (left.w * right.z);
         }
 
         /// <summary>
@@ -437,79 +428,16 @@ namespace Engine
         /// <param name="result">The new quaternion builded from axis and angle as an output parameter.</param>
         public static void FromAxisAngle(ref Vector3 axis, float angle, out Quaternion result)
         {
+            float scale = 1f / axis.Length;
             float half = angle * 0.5f;
-            float sin = (float)Math.Sin(half);
+            float sin = (float)Math.Sin(half) * scale;
             float cos = (float)Math.Cos(half);
             result.x = axis.x * sin;
             result.y = axis.y * sin;
             result.z = axis.z * sin;
             result.w = cos;
         }
-
-        /// <summary>
-        /// Creates a new quaternion from the specified <see cref="Matrix"/>.
-        /// </summary>
-        /// <param name="matrix">The rotation matrix.</param>
-        public static Quaternion FromMatrix(Matrix matrix)
-        {
-            FromMatrix(ref matrix, out Quaternion result);
-            return result;
-        }
-
-        /// <summary>
-        /// Creates a new quaternion from the specified <see cref="Matrix"/>.
-        /// </summary>
-        /// <param name="matrix">The rotation matrix.</param>
-        /// <param name="result">A quaternion composed from the rotation part of the matrix as an output parameter.</param>
-        public static void FromMatrix(ref Matrix matrix, out Quaternion result)
-        {
-            float trace = matrix.m00 + matrix.m11 + matrix.m22;
-
-            if (trace > 0f)
-            {
-                float s = (float)Math.Sqrt(trace + 1f) * 2f;
-                float invS = 1f / s;
-
-                result.x = (matrix.m21 - matrix.m12) * invS;
-                result.y = (matrix.m20 - matrix.m02) * invS;
-                result.z = (matrix.m10 - matrix.m01) * invS;
-                result.w = s * 0.25f;
-            }
-            else
-            {
-                if (matrix.m00 >= matrix.m11 && matrix.m00 >= matrix.m22)
-                {
-                    float s = (float)Math.Sqrt(1f + matrix.m00 - matrix.m11 - matrix.m22) * 2f;
-                    float invS = 1f / s;
-
-                    result.x = s * 0.25f;
-                    result.y = (matrix.m01 + matrix.m10) * invS;
-                    result.z = (matrix.m02 + matrix.m20) * invS;
-                    result.w = (matrix.m21 - matrix.m12) * invS;
-                }
-                else if (matrix.m11 > matrix.m22)
-                {
-                    float s = (float)Math.Sqrt(1f + matrix.m11 - matrix.m00 - matrix.m22) * 2f;
-                    float invS = 1f / s;
-
-                    result.x = (matrix.m01 + matrix.m10) * invS;
-                    result.y = s * 0.25f;
-                    result.z = (matrix.m12 + matrix.m21) * invS;
-                    result.w = (matrix.m02 - matrix.m20) * invS;
-                }
-                else
-                {
-                    float s = (float)Math.Sqrt(1f + matrix.m22 - matrix.m00 - matrix.m11) * 2f;
-                    float invS = 1f / s;
-
-                    result.x = (matrix.m02 + matrix.m20) * invS;
-                    result.y = (matrix.m12 + matrix.m21) * invS;
-                    result.z = s * 0.25f;
-                    result.w = (matrix.m10 - matrix.m01) * invS;
-                }
-            }
-        }
-
+        
         /// <summary>
         /// Creates a new quaternion from the specified yaw, pitch and roll angles.
         /// Rotations are applied roll first, pitch second, and yaw third.
@@ -582,13 +510,14 @@ namespace Engine
             result.z = (blendA * a.z) + (blendB * b.z);
             result.w = (blendA * a.w) + (blendB * b.w);
 
-            if (result.LengthSquared < float.Epsilon)
+            if (result.LengthSquared > float.Epsilon)
+            {
+                Normalize(ref result, out result);
+            }
+            else
             {
                 result = Identity;
-                return;
             }
-
-            Normalize(ref result, out result);
         }
 
         /// <summary>
@@ -612,26 +541,9 @@ namespace Engine
         /// <param name="result">The result of spherical linear blending between two quaternions as an output parameter.</param>
         public static void Slerp(ref Quaternion a, ref Quaternion b, float t, out Quaternion result)
         {
-            // if either input is zero, return the other
-            if (a.LengthSquared < float.Epsilon)
-            {
-                if (b.LengthSquared < float.Epsilon)
-                {
-                    result = Identity;
-                    return;
-                }
-                result = b;
-                return;
-            }
-            if (b.LengthSquared < float.Epsilon)
-            {
-                result = a;
-                return;
-            }
-
             Dot(ref a, ref b, out float cosHalfAngle);
 
-            if (cosHalfAngle <= -1f || 1f <= cosHalfAngle)
+            if (Math.Abs(cosHalfAngle) >= 1f)
             {
                 // angle = 0, so just return either input
                 result = a;
@@ -667,13 +579,14 @@ namespace Engine
             result.z = (blendA * a.z) + (blendB * b.z);
             result.w = (blendA * a.w) + (blendB * b.w);
 
-            if (result.LengthSquared < float.Epsilon)
+            if (result.LengthSquared > float.Epsilon)
+            {
+                Normalize(ref result, out result);
+            }
+            else
             {
                 result = Identity;
-                return;
             }
-
-            Normalize(ref result, out result);
         }
 
         /// <summary>
@@ -698,21 +611,20 @@ namespace Engine
         public static void RotateTowards(ref Quaternion a, ref Quaternion b, float maxDelta, out Quaternion result)
         {
             float angle = Angle(a, b);
-            if (angle < float.Epsilon)
+            if (angle > float.Epsilon)
             {
-                result = b;
+                Slerp(ref a, ref b, Mathf.Min(maxDelta / angle, 1f), out result);
             }
             else
             {
-                Slerp(ref a, ref b, Mathf.Min(maxDelta / angle, 1f), out result);
+                result = b;
             }
         }
 
         /// <summary>
-        /// Compares whether current instance is equal to specified <see cref="Quaternion"/>.
+        /// Compares whether this instance is equal to another.
         /// </summary>
-        /// <param name="other">The <see cref="Quaternion"/> to compare.</param>
-        /// <returns><c>true</c> if the instances are equal, <c>false</c> otherwise.</returns>
+        /// <param name="other">The quaternion to compare.</param>
         public bool Equals(Quaternion other)
         {
             return
@@ -729,11 +641,7 @@ namespace Engine
         /// <returns><c>true</c> if the instances are equal, <c>false</c> otherwise.</returns>
         public override bool Equals(object obj)
         {
-            if (obj is Quaternion)
-            {
-                return Equals((Quaternion)obj);
-            }
-            return false;
+            return (obj is Quaternion) && Equals((Quaternion)obj);
         }
 
         /// <summary>
@@ -756,7 +664,7 @@ namespace Engine
         /// </summary>
         public override string ToString()
         {
-            const string format = "N4";
+            const string format = "F4";
             return $"({x.ToString(format)}, {y.ToString(format)}, {z.ToString(format)}, {w.ToString(format)})";
         }
 

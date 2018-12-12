@@ -12,6 +12,8 @@ Random (Make thread safe)
 Noise
 Curve
 Serialization (binary, json/xml)
+ECS
+Parallelization
 
 //--GEOMERTRY--
 Color

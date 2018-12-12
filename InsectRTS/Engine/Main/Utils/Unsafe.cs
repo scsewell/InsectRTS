@@ -3,6 +3,7 @@
 * See "Licence.txt" for full licence.
 */
 using System;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
@@ -28,25 +29,12 @@ namespace Engine
             where TSrc : struct
             where TDest : struct
         {
-#if DEBUG
             // check the types are copyable
-            if (!IsBlittable<TSrc>())
-            {
-                throw new ArgumentException($"\"{typeof(TSrc).FullName}\" must be a blittable type to use a reinterperet cast!");
-            }
-            else if (!IsBlittable<TDest>())
-            {
-                throw new ArgumentException($"\"{typeof(TDest).FullName}\" must be a blittable type to use a reinterperet cast!");
-            }
+            Debug.Assert(IsBlittable<TSrc>(), $"\"{typeof(TSrc).FullName}\" must be a blittable type to use a reinterperet cast!");
+            Debug.Assert(IsBlittable<TDest>(), $"\"{typeof(TDest).FullName}\" must be a blittable type to use a reinterperet cast!");
 
             // check the types are the same size
-            int srcSize = SizeOf<TSrc>();
-            int destSize = SizeOf<TDest>();
-            if (srcSize != destSize)
-            {
-                throw new ArgumentException($"Can't reinterperet cast, \"{typeof(TSrc).FullName}\" has size {srcSize} but \"{typeof(TDest).FullName}\" has size {destSize}!");
-            }
-#endif
+            Debug.Assert(SizeOf<TSrc>() == SizeOf<TDest>(), $"Can't reinterperet cast, \"{typeof(TSrc).FullName}\" has size {SizeOf<TSrc>()} but \"{typeof(TDest).FullName}\" has size {SizeOf<TDest>()}!");
 
             var sourceRef = __makeref(source);
             var dest = default(TDest);

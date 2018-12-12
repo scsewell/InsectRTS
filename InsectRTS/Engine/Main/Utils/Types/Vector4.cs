@@ -771,306 +771,185 @@ namespace Engine
         }
 
         /// <summary>
-        /// Creates a new <see cref="Vector4"/> that contains a transformation of 2d-vector by the specified <see cref="Matrix"/>.
+        /// Rotates a vector.
         /// </summary>
-        /// <param name="value">Source <see cref="Vector2"/>.</param>
-        /// <param name="matrix">The transformation <see cref="Matrix"/>.</param>
-        /// <returns>Transformed <see cref="Vector4"/>.</returns>
-        public static Vector4 Transform(Vector2 value, Matrix matrix)
+        /// <param name="vector">The vector to transform.</param>
+        /// <param name="rotation">The rotation to apply.</param>
+        public static Vector4 Rotate(Vector4 vector, Quaternion rotation)
         {
-            Transform(ref value, ref matrix, out Vector4 result);
-            return result;
+            Rotate(ref vector, ref rotation, out vector);
+            return vector;
         }
 
         /// <summary>
-        /// Creates a new <see cref="Vector4"/> that contains a transformation of 2d-vector by the specified <see cref="Quaternion"/>.
+        /// Rotates a vector.
         /// </summary>
-        /// <param name="value">Source <see cref="Vector2"/>.</param>
-        /// <param name="rotation">The <see cref="Quaternion"/> which contains rotation transformation.</param>
-        /// <returns>Transformed <see cref="Vector4"/>.</returns>
-        public static Vector4 Transform(Vector2 value, Quaternion rotation)
+        /// <param name="vector">The vector to transform.</param>
+        /// <param name="rotation">The rotation to apply.</param>
+        /// <param name="result">The transformed vector as an output parameter.</param>
+        public static void Rotate(ref Vector4 vector, ref Quaternion rotation, out Vector4 result)
         {
-            Transform(ref value, ref rotation, out Vector4 result);
-            return result;
+            Quaternion v = (Quaternion)vector;
+            Quaternion.Invert(ref rotation, out Quaternion invRotation);
+            Quaternion.Multiply(ref rotation, ref v, out Quaternion t);
+            Quaternion.Multiply(ref t, ref invRotation, out v);
+
+            result.x = v.x;
+            result.y = v.y;
+            result.z = v.z;
+            result.w = v.w;
         }
 
         /// <summary>
-        /// Creates a new <see cref="Vector4"/> that contains a transformation of 3d-vector by the specified <see cref="Matrix"/>.
+        /// Applies a rotation to all vectors within array and places the results in an another array.
         /// </summary>
-        /// <param name="value">Source <see cref="Vector3"/>.</param>
-        /// <param name="matrix">The transformation <see cref="Matrix"/>.</param>
-        /// <returns>Transformed <see cref="Vector4"/>.</returns>
-        public static Vector4 Transform(Vector3 value, Matrix matrix)
+        /// <param name="srcArray">The vectors to transform.</param>
+        /// <param name="rotation">The rotation to apply.</param>
+        /// <param name="destArray">The array transformed vectors are output to.</param>
+        public static void Rotate(Vector4[] srcArray, ref Quaternion rotation, Vector4[] destArray)
         {
-            Transform(ref value, ref matrix, out Vector4 result);
-            return result;
+            if (srcArray == null)
+            {
+                throw new ArgumentNullException("srcArray");
+            }
+            if (destArray == null)
+            {
+                throw new ArgumentNullException("destArray");
+            }
+            if (destArray.Length < srcArray.Length)
+            {
+                throw new ArgumentException("Destination array is smaller than source array.");
+            }
+
+            for (int i = 0; i < srcArray.Length; i++)
+            {
+                Rotate(ref srcArray[i], ref rotation, out destArray[i]);
+            }
         }
 
         /// <summary>
-        /// Creates a new <see cref="Vector4"/> that contains a transformation of 3d-vector by the specified <see cref="Quaternion"/>.
+        /// Applies a rotation to all vectors within array and places the resuls in an another array.
         /// </summary>
-        /// <param name="value">Source <see cref="Vector3"/>.</param>
-        /// <param name="rotation">The <see cref="Quaternion"/> which contains rotation transformation.</param>
-        /// <returns>Transformed <see cref="Vector4"/>.</returns>
-        public static Vector4 Transform(Vector3 value, Quaternion rotation)
-        {
-            Transform(ref value, ref rotation, out Vector4 result);
-            return result;
-        }
-
-        /// <summary>
-        /// Creates a new <see cref="Vector4"/> that contains a transformation of 4d-vector by the specified <see cref="Matrix"/>.
-        /// </summary>
-        /// <param name="value">Source <see cref="Vector4"/>.</param>
-        /// <param name="matrix">The transformation <see cref="Matrix"/>.</param>
-        /// <returns>Transformed <see cref="Vector4"/>.</returns>
-        public static Vector4 Transform(Vector4 value, Matrix matrix)
-        {
-            Transform(ref value, ref matrix, out value);
-            return value;
-        }
-
-        /// <summary>
-        /// Creates a new <see cref="Vector4"/> that contains a transformation of 4d-vector by the specified <see cref="Quaternion"/>.
-        /// </summary>
-        /// <param name="value">Source <see cref="Vector4"/>.</param>
-        /// <param name="rotation">The <see cref="Quaternion"/> which contains rotation transformation.</param>
-        /// <returns>Transformed <see cref="Vector4"/>.</returns>
-        public static Vector4 Transform(Vector4 value, Quaternion rotation)
-        {
-            Transform(ref value, ref rotation, out Vector4 result);
-            return result;
-        }
-
-        /// <summary>
-        /// Creates a new <see cref="Vector4"/> that contains a transformation of 2d-vector by the specified <see cref="Matrix"/>.
-        /// </summary>
-        /// <param name="value">Source <see cref="Vector2"/>.</param>
-        /// <param name="matrix">The transformation <see cref="Matrix"/>.</param>
-        /// <param name="result">Transformed <see cref="Vector4"/> as an output parameter.</param>
-        public static void Transform(ref Vector2 value, ref Matrix matrix, out Vector4 result)
-        {
-            result.x = (value.x * matrix.m00) + (value.y * matrix.m10) + matrix.m30;
-            result.y = (value.x * matrix.m01) + (value.y * matrix.m11) + matrix.m31;
-            result.z = (value.x * matrix.m02) + (value.y * matrix.m12) + matrix.m32;
-            result.w = (value.x * matrix.m03) + (value.y * matrix.m13) + matrix.m33;
-        }
-
-        /// <summary>
-        /// Creates a new <see cref="Vector4"/> that contains a transformation of 2d-vector by the specified <see cref="Quaternion"/>.
-        /// </summary>
-        /// <param name="value">Source <see cref="Vector2"/>.</param>
-        /// <param name="rotation">The <see cref="Quaternion"/> which contains rotation transformation.</param>
-        /// <param name="result">Transformed <see cref="Vector4"/> as an output parameter.</param>
-        public static void Transform(ref Vector2 value, ref Quaternion rotation, out Vector4 result)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Creates a new <see cref="Vector4"/> that contains a transformation of 3d-vector by the specified <see cref="Matrix"/>.
-        /// </summary>
-        /// <param name="value">Source <see cref="Vector3"/>.</param>
-        /// <param name="matrix">The transformation <see cref="Matrix"/>.</param>
-        /// <param name="result">Transformed <see cref="Vector4"/> as an output parameter.</param>
-        public static void Transform(ref Vector3 value, ref Matrix matrix, out Vector4 result)
-        {
-            result.x = (value.x * matrix.m00) + (value.y * matrix.m10) + (value.z * matrix.m20) + matrix.m30;
-            result.y = (value.x * matrix.m01) + (value.y * matrix.m11) + (value.z * matrix.m21) + matrix.m31;
-            result.z = (value.x * matrix.m02) + (value.y * matrix.m12) + (value.z * matrix.m22) + matrix.m32;
-            result.w = (value.x * matrix.m03) + (value.y * matrix.m13) + (value.z * matrix.m23) + matrix.m33;
-        }
-
-        /// <summary>
-        /// Creates a new <see cref="Vector4"/> that contains a transformation of 3d-vector by the specified <see cref="Quaternion"/>.
-        /// </summary>
-        /// <param name="value">Source <see cref="Vector3"/>.</param>
-        /// <param name="rotation">The <see cref="Quaternion"/> which contains rotation transformation.</param>
-        /// <param name="result">Transformed <see cref="Vector4"/> as an output parameter.</param>
-        public static void Transform(ref Vector3 value, ref Quaternion rotation, out Vector4 result)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Creates a new <see cref="Vector4"/> that contains a transformation of 4d-vector by the specified <see cref="Matrix"/>.
-        /// </summary>
-        /// <param name="value">Source <see cref="Vector4"/>.</param>
-        /// <param name="matrix">The transformation <see cref="Matrix"/>.</param>
-        /// <param name="result">Transformed <see cref="Vector4"/> as an output parameter.</param>
-        public static void Transform(ref Vector4 value, ref Matrix matrix, out Vector4 result)
-        {
-            var x = (value.x * matrix.m00) + (value.y * matrix.m10) + (value.z * matrix.m20) + (value.w * matrix.m30);
-            var y = (value.x * matrix.m01) + (value.y * matrix.m11) + (value.z * matrix.m21) + (value.w * matrix.m31);
-            var z = (value.x * matrix.m02) + (value.y * matrix.m12) + (value.z * matrix.m22) + (value.w * matrix.m32);
-            var w = (value.x * matrix.m03) + (value.y * matrix.m13) + (value.z * matrix.m23) + (value.w * matrix.m33);
-            result.x = x;
-            result.y = y;
-            result.z = z;
-            result.w = w;
-        }
-
-        /// <summary>
-        /// Creates a new <see cref="Vector4"/> that contains a transformation of 4d-vector by the specified <see cref="Quaternion"/>.
-        /// </summary>
-        /// <param name="value">Source <see cref="Vector4"/>.</param>
-        /// <param name="rotation">The <see cref="Quaternion"/> which contains rotation transformation.</param>
-        /// <param name="result">Transformed <see cref="Vector4"/> as an output parameter.</param>
-        public static void Transform(ref Vector4 value, ref Quaternion rotation, out Vector4 result)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Apply transformation on vectors within array of <see cref="Vector4"/> by the specified <see cref="Matrix"/> and places the results in an another array.
-        /// </summary>
-        /// <param name="sourceArray">Source array.</param>
-        /// <param name="sourceIndex">The starting index of transformation in the source array.</param>
-        /// <param name="matrix">The transformation <see cref="Matrix"/>.</param>
-        /// <param name="destinationArray">Destination array.</param>
-        /// <param name="destinationIndex">The starting index in the destination array, where the first <see cref="Vector4"/> should be written.</param>
+        /// <param name="srcArray">The vectors to transform.</param>
+        /// <param name="srcIndex">The starting index in the source array.</param>
+        /// <param name="rotation">The rotation to apply.</param>
+        /// <param name="destArray">The array transformed vectors are output to.</param>
+        /// <param name="destIndex">The starting index in the destination array.</param>
         /// <param name="length">The number of vectors to be transformed.</param>
-        public static void Transform
-        (
-            Vector4[] sourceArray,
-            int sourceIndex,
-            ref Matrix matrix,
-            Vector4[] destinationArray,
-            int destinationIndex,
-            int length
-        )
+        public static void Rotate(Vector4[] srcArray, int srcIndex, ref Quaternion rotation, Vector4[] destArray, int destIndex, int length)
         {
-            if (sourceArray == null)
+            if (srcArray == null)
             {
-                throw new ArgumentNullException("sourceArray");
+                throw new ArgumentNullException("srcArray");
+            }
+            if (destArray == null)
+            {
+                throw new ArgumentNullException("destArray");
+            }
+            if (srcArray.Length < srcIndex + length)
+            {
+                throw new ArgumentException("Source array length is lesser than srcIndex + length");
+            }
+            if (destArray.Length < destIndex + length)
+            {
+                throw new ArgumentException("Destination array length is lesser than destIndex + length");
             }
 
-            if (destinationArray == null)
+            for (int i = 0; i < length; i++)
             {
-                throw new ArgumentNullException("destinationArray");
+                Rotate(ref srcArray[srcIndex + i], ref rotation, out destArray[destIndex + i]);
+            }
+        }
+
+        /// <summary>
+        /// Transform a vector.
+        /// </summary>
+        /// <param name="vector">The vector to transform.</param>
+        /// <param name="matrix">The transformation to apply.</param>
+        public static Vector4 Transform(Vector4 vector, Matrix matrix)
+        {
+            Transform(ref vector, ref matrix, out Vector4 result);
+            return result;
+        }
+
+        /// <summary>
+        /// Transform a vector.
+        /// </summary>
+        /// <param name="vector">The vector to transform.</param>
+        /// <param name="matrix">The transformation to apply.</param>
+        /// <param name="result">The transformed vector as an output parameter.</param>
+        public static void Transform(ref Vector4 vector, ref Matrix matrix, out Vector4 result)
+        {
+            result.x = (vector.x * matrix.m00) + (vector.y * matrix.m10) + (vector.z * matrix.m20) + (vector.w * matrix.m30);
+            result.y = (vector.x * matrix.m01) + (vector.y * matrix.m11) + (vector.z * matrix.m21) + (vector.w * matrix.m31);
+            result.z = (vector.x * matrix.m02) + (vector.y * matrix.m12) + (vector.z * matrix.m22) + (vector.w * matrix.m32);
+            result.w = (vector.x * matrix.m03) + (vector.y * matrix.m13) + (vector.z * matrix.m23) + (vector.w * matrix.m33);
+        }
+
+        /// <summary>
+        /// Applies a transformation to all vectors within array and places the resuls in an another array.
+        /// </summary>
+        /// <param name="srcArray">The vectors to transform.</param>
+        /// <param name="srcIndex">The starting index in the source array.</param>
+        /// <param name="matrix">The transformation to apply.</param>
+        /// <param name="destArray">The array transformed vectors are output to.</param>
+        /// <param name="destIndex">The starting index in the destination array.</param>
+        /// <param name="length">The number of vectors to be transformed.</param>
+        public static void Transform(Vector4[] srcArray, ref Matrix matrix, Vector4[] destArray)
+        {
+            if (srcArray == null)
+            {
+                throw new ArgumentNullException("srcArray");
+            }
+            if (destArray == null)
+            {
+                throw new ArgumentNullException("destArray");
+            }
+            if (destArray.Length < srcArray.Length)
+            {
+                throw new ArgumentException("Destination array is smaller than source array.");
             }
 
-            if (sourceArray.Length < sourceIndex + length)
+            for (int i = 0; i < srcArray.Length; i++)
+            {
+                Transform(ref srcArray[i], ref matrix, out destArray[i]);
+            }
+        }
+        
+        /// <summary>
+        /// Applies a transformation to all vectors within array and places the resuls in an another array.
+        /// </summary>
+        /// <param name="srcArray">The vectors to transform.</param>
+        /// <param name="srcIndex">The starting index in the source array.</param>
+        /// <param name="matrix">The transformation to apply.</param>
+        /// <param name="destArray">The array transformed vectors are output to.</param>
+        /// <param name="destIndex">The starting index in the destination array.</param>
+        /// <param name="length">The number of vectors to be transformed.</param>
+        public static void Transform(Vector4[] srcArray, int srcIndex, ref Matrix matrix, Vector4[] destArray, int destIndex, int length)
+        {
+            if (srcArray == null)
+            {
+                throw new ArgumentNullException("srcArray");
+            }
+            if (destArray == null)
+            {
+                throw new ArgumentNullException("destArray");
+            }
+            if (srcArray.Length < srcIndex + length)
             {
                 throw new ArgumentException("Source array length is lesser than sourceIndex + length");
             }
-
-            if (destinationArray.Length < destinationIndex + length)
+            if (destArray.Length < destIndex + length)
             {
                 throw new ArgumentException("Destination array length is lesser than destinationIndex + length");
             }
 
-            for (var i = 0; i < length; i++)
+            for (int i = 0; i < length; i++)
             {
-                var value = sourceArray[sourceIndex + i];
-                destinationArray[destinationIndex + i] = Transform(value, matrix);
+                Transform(ref srcArray[srcIndex + i], ref matrix, out destArray[destIndex + i]);
             }
         }
-
-        /// <summary>
-        /// Apply transformation on vectors within array of <see cref="Vector4"/> by the specified <see cref="Quaternion"/> and places the results in an another array.
-        /// </summary>
-        /// <param name="sourceArray">Source array.</param>
-        /// <param name="sourceIndex">The starting index of transformation in the source array.</param>
-        /// <param name="rotation">The <see cref="Quaternion"/> which contains rotation transformation.</param>
-        /// <param name="destinationArray">Destination array.</param>
-        /// <param name="destinationIndex">The starting index in the destination array, where the first <see cref="Vector4"/> should be written.</param>
-        /// <param name="length">The number of vectors to be transformed.</param>
-        public static void Transform(
-            Vector4[] sourceArray,
-            int sourceIndex,
-            ref Quaternion rotation,
-            Vector4[] destinationArray,
-            int destinationIndex,
-            int length
-            )
-        {
-            if (sourceArray == null)
-            {
-                throw new ArgumentNullException("sourceArray");
-            }
-
-            if (destinationArray == null)
-            {
-                throw new ArgumentNullException("destinationArray");
-            }
-
-            if (sourceArray.Length < sourceIndex + length)
-            {
-                throw new ArgumentException("Source array length is lesser than sourceIndex + length");
-            }
-
-            if (destinationArray.Length < destinationIndex + length)
-            {
-                throw new ArgumentException("Destination array length is lesser than destinationIndex + length");
-            }
-
-            for (var i = 0; i < length; i++)
-            {
-                var value = sourceArray[sourceIndex + i];
-                destinationArray[destinationIndex + i] = Transform(value, rotation);
-            }
-        }
-
-        /// <summary>
-        /// Apply transformation on all vectors within array of <see cref="Vector4"/> by the specified <see cref="Matrix"/> and places the results in an another array.
-        /// </summary>
-        /// <param name="sourceArray">Source array.</param>
-        /// <param name="matrix">The transformation <see cref="Matrix"/>.</param>
-        /// <param name="destinationArray">Destination array.</param>
-        public static void Transform(Vector4[] sourceArray, ref Matrix matrix, Vector4[] destinationArray)
-        {
-            if (sourceArray == null)
-            {
-                throw new ArgumentNullException("sourceArray");
-            }
-
-            if (destinationArray == null)
-            {
-                throw new ArgumentNullException("destinationArray");
-            }
-
-            if (destinationArray.Length < sourceArray.Length)
-            {
-                throw new ArgumentException("Destination array length is lesser than source array length");
-            }
-
-            for (var i = 0; i < sourceArray.Length; i++)
-            {
-                var value = sourceArray[i];
-                destinationArray[i] = Transform(value, matrix);
-            }
-        }
-
-        /// <summary>
-        /// Apply transformation on all vectors within array of <see cref="Vector4"/> by the specified <see cref="Quaternion"/> and places the results in an another array.
-        /// </summary>
-        /// <param name="sourceArray">Source array.</param>
-        /// <param name="rotation">The <see cref="Quaternion"/> which contains rotation transformation.</param>
-        /// <param name="destinationArray">Destination array.</param>
-        public static void Transform(Vector4[] sourceArray, ref Quaternion rotation, Vector4[] destinationArray)
-        {
-            if (sourceArray == null)
-            {
-                throw new ArgumentNullException("sourceArray");
-            }
-
-            if (destinationArray == null)
-            {
-                throw new ArgumentNullException("destinationArray");
-            }
-
-            if (destinationArray.Length < sourceArray.Length)
-            {
-                throw new ArgumentException("Destination array length is lesser than source array length");
-            }
-
-            for (var i = 0; i < sourceArray.Length; i++)
-            {
-                var value = sourceArray[i];
-                destinationArray[i] = Transform(value, rotation);
-            }
-        }
+        
         /// <summary>
         /// Compares whether current instance is equal to a specified vector.
         /// </summary>
@@ -1115,7 +994,7 @@ namespace Engine
         /// </summary>
         public override string ToString()
         {
-            const string format = "N2";
+            const string format = "F2";
             return $"({x.ToString(format)}, {y.ToString(format)}, {z.ToString(format)}, {w.ToString(format)})";
         }
 
@@ -1294,6 +1173,15 @@ namespace Engine
         public static implicit operator Color(Vector4 vector)
         {
             return new Color(vector.x, vector.y, vector.z, vector.w);
+        }
+
+        /// <summary>
+        /// Cast the vector to a <see cref="Quaternion"/>.
+        /// </summary>
+        /// <param name="vector">The vector to cast.</param>
+        public static explicit operator Quaternion(Vector4 vector)
+        {
+            return new Quaternion(vector.x, vector.y, vector.z, vector.w);
         }
 
         /// <summary>

@@ -2,7 +2,6 @@
 * Copyright © 2018-2019 Scott Sewell
 * See "Licence.txt" for full licence.
 */
-using OpenTK;
 
 namespace Engine
 {
@@ -50,7 +49,9 @@ namespace Engine
             Vector3 random;
             do
             {
-                random = new Vector3(GetRange(-1, 1), GetRange(-1, 1), GetRange(-1, 1));
+                random.x = GetRange(-1, 1);
+                random.y = GetRange(-1, 1);
+                random.z = GetRange(-1, 1);
             }
             while (random.LengthSquared > 1);
             return random;
