@@ -14,6 +14,9 @@ namespace Engine
     {
         private static int m_mainThreadId;
         
+        /// <summary>
+        /// Records the currently executing thead as the main thread.
+        /// </summary>
         public static void SetMainThread()
         {
             m_mainThreadId = Thread.CurrentThread.ManagedThreadId;

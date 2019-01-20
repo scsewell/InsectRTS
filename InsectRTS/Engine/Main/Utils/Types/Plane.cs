@@ -3,295 +3,267 @@
 * See "Licence.txt" for full licence.
 */
 using System;
-using System.Diagnostics;
-using System.Runtime.Serialization;
+using System.Runtime.InteropServices;
 
-/*
 namespace Engine
 {
-	internal class PlaneHelper
-    {
-        /// <summary>
-        /// Returns a value indicating what side (positive/negative) of a plane a point is
-        /// </summary>
-        /// <param name="point">The point to check with</param>
-        /// <param name="plane">The plane to check against</param>
-        /// <returns>Greater than zero if on the positive side, less than zero if on the negative size, 0 otherwise</returns>
-        public static float ClassifyPoint(ref Vector3 point, ref Plane plane)
-        {
-            return point.x * plane.Normal.x + point.y * plane.Normal.y + point.z * plane.Normal.z + plane.D;
-        }
-
-        /// <summary>
-        /// Returns the perpendicular distance from a point to a plane
-        /// </summary>
-        /// <param name="point">The point to check</param>
-        /// <param name="plane">The place to check</param>
-        /// <returns>The perpendicular distance from the point to the plane</returns>
-        public static float PerpendicularDistance(ref Vector3 point, ref Plane plane)
-        {
-            // dist = (ax + by + cz + d) / sqrt(a*a + b*b + c*c)
-            return (float)Math.Abs((plane.Normal.x * point.x + plane.Normal.y * point.y + plane.Normal.z * point.z)
-                                    / Math.Sqrt(plane.Normal.x * plane.Normal.x + plane.Normal.y * plane.Normal.y + plane.Normal.z * plane.Normal.z));
-        }
-    }
-	
-    [DataContract]
-    [DebuggerDisplay("{DebugDisplayString,nq}")]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct Plane : IEquatable<Plane>
     {
-        #region Public Fields
+        /// <summary>
+        /// The distance of the plane from the origin.
+        /// </summary>
+        public float distance;
 
-        [DataMember]
-        public float D;
+        /// <summary>
+        /// The normal of the plane.
+        /// </summary>
+        public Vector3 normal;
 
-        [DataMember]
-        public Vector3 Normal;
+        /// <summary>
+        /// Returns a flipped copy of this plane.
+        /// </summary>
+        public Plane Flipped => new Plane(-normal, -distance);
 
-        #endregion Public Fields
-
-
-        #region Constructors
-
-        public Plane(Vector4 value)
-            : this(new Vector3(value.x, value.y, value.z), value.w)
+        /// <summary>
+        /// Constructs a new plane from a vector.
+        /// </summary>
+        /// <param name="plane">The normal in the XYZ components and the disance in the W component.</param>
+        public Plane(Vector4 plane) : this(new Vector3(plane.x, plane.y, plane.z), plane.w)
         {
-
         }
 
-        public Plane(Vector3 normal, float d)
+        /// <summary>
+        /// Constructs a new plane.
+        /// </summary>
+        /// <param name="normal">The plane normal.</param>
+        /// <param name="distance">The plane distance.</param>
+        public Plane(Vector3 normal, float distance)
         {
-            Normal = normal;
-            D = d;
+            Vector3.Normalize(ref normal, out this.normal);
+            this.distance = distance;
         }
 
+        /// <summary>
+        /// Constructs a new plane from a normal and a point on the plane.
+        /// </summary>
+        /// <param name="normal">The plane normal.</param>
+        /// <param name="point">A point on the plane.</param
+        public Plane(Vector3 normal, Vector3 point)
+        {
+            Vector3.Normalize(ref normal, out this.normal);
+            distance = -Vector3.Dot(this.normal, point);
+        }
+
+        /// <summary>
+        /// Constructs a new plane which contains three given points.
+        /// </summary>
+        /// <param name="a">The first point.</param>
+        /// <param name="b">The second point.</param>
+        /// <param name="c">The third point.</param>
         public Plane(Vector3 a, Vector3 b, Vector3 c)
         {
-            Vector3 ab = b - a;
-            Vector3 ac = c - a;
-
-            Vector3 cross = Vector3.Cross(ab, ac);
-            Vector3.Normalize(ref cross, out Normal);
-            D = -(Vector3.Dot(Normal, a));
-        }
-
-        public Plane(float a, float b, float c, float d)
-            : this(new Vector3(a, b, c), d)
-        {
-
-        }
-
-        #endregion Constructors
-
-
-        #region Public Methods
-
-        public float Dot(Vector4 value)
-        {
-            return ((((this.Normal.x * value.x) + (this.Normal.y * value.y)) + (this.Normal.z * value.z)) + (this.D * value.w));
-        }
-
-        public void Dot(ref Vector4 value, out float result)
-        {
-            result = (((this.Normal.x * value.x) + (this.Normal.y * value.y)) + (this.Normal.z * value.z)) + (this.D * value.w);
-        }
-
-        public float DotCoordinate(Vector3 value)
-        {
-            return ((((this.Normal.x * value.x) + (this.Normal.y * value.y)) + (this.Normal.z * value.z)) + this.D);
-        }
-
-        public void DotCoordinate(ref Vector3 value, out float result)
-        {
-            result = (((this.Normal.x * value.x) + (this.Normal.y * value.y)) + (this.Normal.z * value.z)) + this.D;
-        }
-
-        public float DotNormal(Vector3 value)
-        {
-            return (((this.Normal.x * value.x) + (this.Normal.y * value.y)) + (this.Normal.z * value.z));
-        }
-
-        public void DotNormal(ref Vector3 value, out float result)
-        {
-            result = ((this.Normal.x * value.x) + (this.Normal.y * value.y)) + (this.Normal.z * value.z);
+            Vector3 cross = Vector3.Cross(b - a, c - a);
+            Vector3.Normalize(ref cross, out normal);
+            distance = -Vector3.Dot(normal, a);
         }
 
         /// <summary>
-        /// Transforms a normalized plane by a matrix.
+        /// Flips the plane's normal.
         /// </summary>
-        /// <param name="plane">The normalized plane to transform.</param>
-        /// <param name="matrix">The transformation matrix.</param>
-        /// <returns>The transformed plane.</returns>
-        public static Plane Transform(Plane plane, Matrix matrix)
+        public void Flip()
         {
-            Plane result;
-            Transform(ref plane, ref matrix, out result);
+            normal = -normal;
+            distance = -distance;
+        }
+
+        /// <summary>
+        /// Gets the distance from the plane to a point along the plane's normal.
+        /// </summary>
+        /// <param name="point">The point.</param>
+        /// <returns>The distance from the plane.</returns>
+        public float DistanceToPoint(Vector3 point)
+        {
+            DistanceToPoint(ref point, out float result);
             return result;
         }
 
         /// <summary>
-        /// Transforms a normalized plane by a matrix.
+        /// Gets the distance from the plane to a point along the plane's normal.
         /// </summary>
-        /// <param name="plane">The normalized plane to transform.</param>
-        /// <param name="matrix">The transformation matrix.</param>
-        /// <param name="result">The transformed plane.</param>
-        public static void Transform(ref Plane plane, ref Matrix matrix, out Plane result)
+        /// <param name="point">The point.</param>
+        /// <param name="result">The result as an out parameter.</param>
+        public void DistanceToPoint(ref Vector3 point, out float result)
         {
-            // See "Transforming Normals" in http://www.glprogramming.com/red/appendixf.html
-            // for an explanation of how this works.
-
-            Matrix transformedMatrix;
-            Matrix.Invert(ref matrix, out transformedMatrix);
-            Matrix.Transpose(ref transformedMatrix, out transformedMatrix);
-
-            var vector = new Vector4(plane.Normal, plane.D);
-
-            Vector4 transformedVector;
-            Vector4.Transform(ref vector, ref transformedMatrix, out transformedVector);
-
-            result = new Plane(transformedVector);
+            Vector3.Dot(ref normal, ref point, out result);
+            result += distance;
         }
 
         /// <summary>
-        /// Transforms a normalized plane by a quaternion rotation.
+        /// Gets the point on the plane closest to a given point.
         /// </summary>
-        /// <param name="plane">The normalized plane to transform.</param>
-        /// <param name="rotation">The quaternion rotation.</param>
-        /// <returns>The transformed plane.</returns>
-        public static Plane Transform(Plane plane, Quaternion rotation)
+        /// <param name="point">The point.</param>
+        /// <returns>The closest point on the plane.</returns>
+        public Vector3 ClosestPointOnPlane(Vector3 point)
         {
-            Plane result;
-            Transform(ref plane, ref rotation, out result);
+            ClosestPointOnPlane(ref point, out point);
+            return point;
+        }
+
+        /// <summary>
+        /// Gets the point on the plane closest to a given point.
+        /// </summary>
+        /// <param name="point">The point.</param>
+        /// <param name="result">The result as an out parameter.</param>
+        public void ClosestPointOnPlane(ref Vector3 point, out Vector3 result)
+        {
+            DistanceToPoint(ref point, out float pointDistance);
+            result = point - (pointDistance * normal);
+        }
+
+        /// <summary>
+        /// Returns if a point is on the positive side of the plane (the side the normal is pointing along).
+        /// </summary>
+        /// <param name="point">The point to classify.</param>
+        /// <returns>True if the point is on the positive side, false otherwise.</returns>
+        public bool ClassifyPoint(Vector3 point)
+        {
+            ClassifyPoint(ref point, out bool result);
             return result;
         }
 
         /// <summary>
-        /// Transforms a normalized plane by a quaternion rotation.
+        /// Returns if a point is on the positive side of the plane (the side the normal is pointing along).
         /// </summary>
-        /// <param name="plane">The normalized plane to transform.</param>
-        /// <param name="rotation">The quaternion rotation.</param>
-        /// <param name="result">The transformed plane.</param>
-        public static void Transform(ref Plane plane, ref Quaternion rotation, out Plane result)
+        /// <param name="point">The point to classify.</param>
+        /// <param name="result">The result as an out parameter.</param>
+        public void ClassifyPoint(ref Vector3 point, out bool result)
         {
-            Vector3.Transform(ref plane.Normal, ref rotation, out result.Normal);
-            result.D = plane.D;
+            DistanceToPoint(ref point, out float pointDistance);
+            result = pointDistance > 0f;
         }
 
-        public void Normalize()
+        /// <summary>
+        /// Checks if two points are on the same side of the plane.
+        /// </summary>
+        /// <param name="a">The first point.</param>
+        /// <param name="b">The second point.</param>
+        /// <returns>True if the points are on the same side of the plane.</returns>
+        public bool SameSide(Vector3 a, Vector3 b)
         {
-            float length = Normal.Length();
-            float factor =  1f / length;            
-            Vector3.Multiply(ref Normal, factor, out Normal);
-            D = D * factor;
+            SameSide(ref a, ref b, out bool result);
+            return result;
         }
 
-        public static Plane Normalize(Plane value)
+        /// <summary>
+        /// Checks if two points are on the same side of the plane.
+        /// </summary>
+        /// <param name="a">The first point.</param>
+        /// <param name="b">The second point.</param>
+        /// <param name="result">The result as an out parameter.</param>
+        public void SameSide(ref Vector3 a, ref Vector3 b, out bool result)
         {
-			Plane ret;
-			Normalize(ref value, out ret);
-			return ret;
+            ClassifyPoint(ref a, out bool aSide);
+            ClassifyPoint(ref b, out bool bSide);
+            result = aSide == bSide;
         }
 
-        public static void Normalize(ref Plane value, out Plane result)
+        /// <summary>
+        /// Raycasts this plane.
+        /// </summary>
+        /// <param name="ray">The ray to check.</param>
+        /// <param name="hitDistance">The distance of the hit from the ray origin.</param>
+        /// <returns>True if the hit is in front of the ray, otherwise false.</returns>
+        public bool Raycast(Ray ray, out float hitDistance)
         {
-            float length = value.Normal.Length();
-            float factor =  1f / length;            
-            Vector3.Multiply(ref value.Normal, factor, out result.Normal);
-            result.D = value.D * factor;
+            return Raycast(ref ray, out hitDistance);
         }
 
-        public static bool operator !=(Plane plane1, Plane plane2)
+        /// <summary>
+        /// Raycasts this plane.
+        /// </summary>
+        /// <param name="ray">The ray to check.</param>
+        /// <param name="hitDistance">The distance of the hit from the ray origin.</param>
+        /// <returns>True if the hit is in front of the ray, otherwise false.</returns>
+        public bool Raycast(ref Ray ray, out float hitDistance)
         {
-            return !plane1.Equals(plane2);
-        }
+            Vector3.Dot(ref normal, ref ray.direction, out float dirDot);
 
-        public static bool operator ==(Plane plane1, Plane plane2)
-        {
-            return plane1.Equals(plane2);
-        }
+            if (Mathf.Abs(dirDot) < float.Epsilon)
+            {
+                hitDistance = 0f;
+                return false;
+            }
 
-        public override bool Equals(object other)
-        {
-            return (other is Plane) ? this.Equals((Plane)other) : false;
-        }
+            Vector3.Dot(ref normal, ref ray.origin, out float originDot);
+            originDot = -originDot - distance;
 
+            hitDistance = originDot / dirDot;
+            return hitDistance > 0f;
+        }
+        
+        /// <summary>
+        /// Compares whether the current instance is equal to a specified vector.
+        /// </summary>
+        /// <param name="other">The vector to compare.</param>
+        /// <returns><c>true</c> if the instances are equal, <c>false</c> otherwise.</returns>
         public bool Equals(Plane other)
         {
-            return ((Normal == other.Normal) && (D == other.D));
+            return ((normal == other.normal) && (distance == other.distance));
         }
 
+        /// <summary>
+        /// Compares whether the current instance is equal to specified <see cref="Object"/>.
+        /// </summary>
+        /// <param name="obj">The <see cref="Object"/> to compare.</param>
+        /// <returns><c>true</c> if the instances are equal, <c>false</c> otherwise.</returns>
+        public override bool Equals(object obj)
+        {
+            return (obj is Plane) && Equals((Plane)obj);
+        }
+
+        /// <summary>
+        /// Gets the hash code of this instance.
+        /// </summary>
         public override int GetHashCode()
         {
-            return Normal.GetHashCode() ^ D.GetHashCode();
-        }
-
-        public PlaneIntersectionType Intersects(BoundingBox box)
-        {
-            return box.Intersects(this);
-        }
-
-        public void Intersects(ref BoundingBox box, out PlaneIntersectionType result)
-        {
-            box.Intersects (ref this, out result);
-        }
-
-        public PlaneIntersectionType Intersects(BoundingFrustum frustum)
-        {
-            return frustum.Intersects(this);
-        }
-
-        public PlaneIntersectionType Intersects(BoundingSphere sphere)
-        {
-            return sphere.Intersects(this);
-        }
-
-        public void Intersects(ref BoundingSphere sphere, out PlaneIntersectionType result)
-        {
-            sphere.Intersects(ref this, out result);
-        }
-
-        internal PlaneIntersectionType Intersects(ref Vector3 point)
-        {
-            float distance;
-            DotCoordinate(ref point, out distance);
-
-            if (distance > 0)
-                return PlaneIntersectionType.Front;
-
-            if (distance < 0)
-                return PlaneIntersectionType.Back;
-
-            return PlaneIntersectionType.Intersecting;
-        }
-
-        internal string DebugDisplayString
-        {
-            get
+            unchecked
             {
-                return string.Concat(
-                    this.Normal.DebugDisplayString, "  ",
-                    this.D.ToString()
-                    );
+                return (normal.GetHashCode() * 397) ^ distance.GetHashCode();
             }
         }
 
+        /// <summary>
+        /// Returns a <see cref="String"/> representation of this instance.
+        /// </summary>
         public override string ToString()
         {
-            return "{Normal:" + Normal + " D:" + D + "}";
+            return $"{{normal:{normal} distance:{distance}}}";
         }
 
         /// <summary>
-        /// Deconstruction method for <see cref="Plane"/>.
+        /// Compares whether two instances are equal.
         /// </summary>
-        /// <param name="normal"></param>
-        /// <param name="d"></param>
-        public void Deconstruct(out Vector3 normal, out float d)
-        {
-            normal = Normal;
-            d = D;
-        }
+        /// <param name="left">Left operand.</param>
+        /// <param name="right">Right operand.</param>
+        /// <returns><c>true</c> if the instances are equal, <c>false</c> otherwise.</returns>
+        public static bool operator ==(Plane left, Plane right) => left.Equals(right);
 
-        #endregion
+        /// <summary>
+        /// Compares whether two instances are not equal.
+        /// </summary>
+        /// <param name="left">Left operand.</param>
+        /// <param name="right">Right operand.</param>
+        /// <returns><c>true</c> if the instances are not equal, <c>false</c> otherwise.</returns>
+        public static bool operator !=(Plane left, Plane right) => !left.Equals(right);
+
+        /// <summary>
+        /// Casts a plane to a <see cref="Vector4"/>.
+        /// </summary>
+        /// <param name="plane">The plane to cast.</param>
+        public static explicit operator Vector4(Plane plane)
+        {
+            return new Vector4(plane.normal, plane.distance);
+        }
     }
 }
-*/

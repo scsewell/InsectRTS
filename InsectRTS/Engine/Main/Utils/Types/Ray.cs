@@ -13,27 +13,16 @@ namespace Engine
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct Ray : IEquatable<Ray>
     {
-        private Vector3 m_origin;
-        private Vector3 m_direction;
-
         /// <summary>
         /// The origin of the ray.
         /// </summary>
-        public Vector3 Origin
-        {
-            get => m_origin;
-            set => m_origin = value;
-        }
+        public Vector3 origin;
 
         /// <summary>
         /// The direction of the ray.
         /// </summary>
-        public Vector3 Direction
-        {
-            get => m_direction;
-            set => m_direction = value.Normalized;
-        }
-
+        public Vector3 direction;
+        
         /// <summary>
         /// Creates a new ray instance.
         /// </summary>
@@ -41,8 +30,8 @@ namespace Engine
         /// <param name="direction">The direction of the ray.</param>
         public Ray(Vector3 origin, Vector3 direction)
         {
-            m_origin = origin;
-            m_direction = direction.Normalized;
+            this.origin = origin;
+            Vector3.Normalize(ref direction, out this.direction);
         }
         
         /// <summary>
@@ -51,7 +40,7 @@ namespace Engine
         /// <param name="t">The distance along the ray.</param>
         public Vector3 GetPoint(float t)
         {
-            return m_origin + (m_direction * t);
+            return origin + (direction * t);
         }
 
         /*
@@ -236,7 +225,7 @@ namespace Engine
         /// <returns><c>true</c> if the instances are equal, <c>false</c> otherwise.</returns>
         public bool Equals(Ray other)
         {
-            return m_origin == other.m_origin && m_direction == other.m_direction;
+            return origin == other.origin && direction == other.direction;
         }
         
         /// <summary>
@@ -256,7 +245,7 @@ namespace Engine
         {
             unchecked
             {
-                return (m_origin.GetHashCode() * 397) ^ m_direction.GetHashCode();
+                return (origin.GetHashCode() * 397) ^ direction.GetHashCode();
             }
         }
 
@@ -265,11 +254,11 @@ namespace Engine
         /// </summary>
         public override string ToString()
         {
-            return $"{{origin:{m_origin} + direction:{m_direction}}}";
+            return $"{{origin:{origin} direction:{direction}}}";
         }
 
         /// <summary>
-        /// Compares whether two instance are equal.
+        /// Compares whether two instances are equal.
         /// </summary>
         /// <param name="left">Left operand.</param>
         /// <param name="right">Right operand.</param>
@@ -277,7 +266,7 @@ namespace Engine
         public static bool operator ==(Ray left, Ray right) => left.Equals(right);
 
         /// <summary>
-        /// Compares whether two instance are not equal.
+        /// Compares whether two instances are not equal.
         /// </summary>
         /// <param name="left">Left operand.</param>
         /// <param name="right">Right operand.</param>

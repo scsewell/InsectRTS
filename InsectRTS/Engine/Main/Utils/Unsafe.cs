@@ -36,9 +36,9 @@ namespace Engine
             // check the types are the same size
             Debug.Assert(SizeOf<TSrc>() == SizeOf<TDest>(), $"Can't reinterperet cast, \"{typeof(TSrc).FullName}\" has size {SizeOf<TSrc>()} but \"{typeof(TDest).FullName}\" has size {SizeOf<TDest>()}!");
 
-            var sourceRef = __makeref(source);
-            var dest = default(TDest);
-            var destRef = __makeref(dest);
+            TDest dest = default(TDest);
+            TypedReference sourceRef = __makeref(source);
+            TypedReference destRef = __makeref(dest);
             *(IntPtr*)&destRef = *(IntPtr*)&sourceRef;
             return __refvalue(destRef, TDest);
         }
@@ -67,10 +67,10 @@ namespace Engine
 
             public static unsafe int SizeOf()
             {
-                var doubleStruct = default(DoubleStruct);
+                DoubleStruct doubleStruct = default(DoubleStruct);
 
-                var tRef0 = __makeref(doubleStruct.value0);
-                var tRef1 = __makeref(doubleStruct.value1);
+                TypedReference tRef0 = __makeref(doubleStruct.value0);
+                TypedReference tRef1 = __makeref(doubleStruct.value1);
 
                 IntPtr ptrToT0 = *((IntPtr*)&tRef0);
                 IntPtr ptrToT1 = *((IntPtr*)&tRef1);

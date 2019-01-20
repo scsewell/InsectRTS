@@ -1087,7 +1087,7 @@ namespace Engine
         /// </summary>
         /// <param name="left">Left operand.</param>
         /// <param name="right">Right operand.</param>
-        /// <returns><c>true</c> if the instances are not equal, <c>false</c> otherwise.</returns>	
+        /// <returns><c>true</c> if the instances are not equal, <c>false</c> otherwise.</returns>
         public static bool operator !=(Vector2 left, Vector2 right)
         {
             return left.x != right.x || left.y != right.y;
